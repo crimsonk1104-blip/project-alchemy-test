@@ -24,6 +24,37 @@
 @media(orientation:landscape) and (max-height:900px) and (max-width:1200px){
 .app{padding:8px}.masthead,.hero-copy{display:none}.main-grid{grid-template-columns:1fr}.game-panel{display:grid;grid-template-columns:112px minmax(0,1fr) 112px}.panel-topline{grid-column:1/-1;padding:6px 10px}.stage-wrap{grid-column:2;grid-row:2}.stage-wrap canvas{max-height:calc(100svh - 110px);object-fit:contain}.stage-hud{display:none}.stage-bottom-label{font-size:10px;left:6px;bottom:6px;padding:4px;max-width:calc(100% - 12px)}.mobile-controls{display:contents}.joystick{grid-column:1;grid-row:2;align-self:center;justify-self:center;width:100px;height:100px}.action-stack{grid-column:3;grid-row:2;align-self:center;justify-self:center}.attack-btn{width:88px;height:82px}.game-toolbar{grid-row:3;grid-column:1/-1;padding:6px 10px}.keyhint{display:none}.sidebar{margin-top:12px}
 }
+/* Dedicated viewport: only game controls suppress touch gestures. */
+html.play-active{overflow:hidden;overscroll-behavior-y:none;scroll-behavior:auto}
+.play-active body{position:fixed;top:var(--play-scroll-top);left:0;width:100%;overflow:hidden;overscroll-behavior-y:none}
+.play-active .app>:not(.main-grid),.play-active .sidebar{display:none}
+.game-panel.play-screen{position:fixed;z-index:1000;left:var(--play-left,0px);top:var(--play-top,0px);width:var(--play-width,100vw);height:var(--play-height,100dvh);margin:0;border-radius:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overflow:hidden;overscroll-behavior-y:none;background:#101f23;touch-action:manipulation}
+.game-panel.play-screen:fullscreen{left:0;top:0;width:100%;height:100%}
+.play-screen .panel-topline,.play-screen .keyhint,.play-screen #play-mode-btn{display:none}
+.play-screen .game-toolbar{grid-column:1;grid-row:1;display:flex;flex-wrap:wrap;padding:6px 10px;gap:6px;min-width:0}
+.play-screen .toolbar-actions{display:flex;flex-wrap:wrap;gap:5px}
+.play-screen .tool-btn{touch-action:manipulation;padding:7px 9px;min-height:36px}
+#play-stats{display:none;font-size:12px;line-height:1.5}
+.play-screen #play-stats{display:block}
+.play-screen .stage-wrap{grid-column:1;grid-row:2;min-height:0;min-width:0;width:100%;height:100%;touch-action:pinch-zoom}
+.play-screen .stage-wrap canvas{display:block;width:100%;height:100%;max-height:none;aspect-ratio:auto;object-fit:contain;touch-action:pinch-zoom}
+.play-screen .stage-hud{display:none}
+.play-screen .mobile-controls{grid-column:1;grid-row:3;display:flex;align-items:center;justify-content:space-between;padding:8px max(20px,env(safe-area-inset-left)) 12px;gap:20px;touch-action:auto}
+.play-screen .joystick{width:clamp(94px,18dvh,132px);height:clamp(94px,18dvh,132px)}
+.play-screen .action-stack{align-self:center}
+.play-screen .attack-btn{width:94px;height:82px}
+.play-screen .stage-bottom-label{font-size:11px;left:8px;bottom:8px;max-width:calc(100% - 16px);padding:5px}
+#fullscreen-btn,#exit-play-btn{display:none}
+.play-screen #exit-play-btn{display:inline-block}
+.play-screen #fullscreen-btn:not([hidden]){display:inline-block}
+@media(orientation:landscape){
+.game-panel.play-screen{grid-template-columns:112px minmax(0,1fr) 112px;grid-template-rows:auto minmax(0,1fr)}
+.play-screen .game-toolbar{grid-column:1/-1}
+.play-screen .stage-wrap{grid-column:2;grid-row:2}
+.play-screen .mobile-controls{display:contents}
+.play-screen .joystick{width:100px;height:100px;grid-column:1;grid-row:2;align-self:end;justify-self:center;margin-bottom:12px}
+.play-screen .action-stack{grid-column:3;grid-row:2;align-self:end;justify-self:center;margin-bottom:12px}
+}
 </style>
 </head>
 <body>
@@ -48,7 +79,7 @@
         </div>
         <div class="game-toolbar">
           <div class="keyhint"><span class="keycap">W</span><span class="keycap">A</span><span class="keycap">S</span><span class="keycap">D</span> 이동 <span class="keycap widekey">SPACE / J</span> 누르고 있으면 연속 공격</div>
-          <div class="toolbar-actions"><button type="button" id="pause-btn" class="tool-btn">Ⅱ 일시정지</button><button type="button" id="reset-btn" class="tool-btn tool-btn-bright">↻ 다시 시작</button></div>
+          <output id="play-stats" aria-label="전투 상태"></output><div class="toolbar-actions"><button type="button" class="tool-btn tool-btn-bright" id="play-mode-btn">게임 시작 · 전용 화면</button><button type="button" class="tool-btn" id="fullscreen-btn" hidden>전체 화면</button><button type="button" class="tool-btn" id="exit-play-btn">플레이 종료</button><button type="button" id="pause-btn" class="tool-btn">Ⅱ 일시정지</button><button type="button" id="reset-btn" class="tool-btn tool-btn-bright">↻ 다시 시작</button></div>
         </div>
         <div class="mobile-controls" aria-label="터치 조작 버튼">
           <div id="joystick" class="joystick" role="group" aria-label="가상 조이스틱: 드래그하여 이동"><div id="joystick-knob" class="joystick-knob"></div></div>
@@ -205,6 +236,52 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   let paused = false;
   let started = false;
   const messages = [];
+  const playPanel=document.querySelector('.game-panel');
+  let playSession=null,fullscreenOwned=false;
+  function sizePlayScreen(){
+    if(!playSession)return;
+    const v=window.visualViewport;
+    const values={'--play-left':(v?.offsetLeft||0)+'px','--play-top':(v?.offsetTop||0)+'px','--play-width':(v?.width||innerWidth)+'px','--play-height':(v?.height||innerHeight)+'px'};
+    for(const [name,value] of Object.entries(values))playPanel.style.setProperty(name,value);
+  }
+  function enterPlayMode(){
+    if(playSession||!started)return;
+    clearInput();
+    playSession={x:scrollX,y:scrollY,focus:document.activeElement,style:playPanel.getAttribute('style'),scrollTop:document.documentElement.style.getPropertyValue('--play-scroll-top')};
+    document.documentElement.style.setProperty('--play-scroll-top',-playSession.y+'px');
+    document.documentElement.classList.add('play-active');playPanel.classList.add('play-screen');
+    sizePlayScreen();paused=false;$('pause-btn').textContent='Ⅱ 일시정지';
+    $('fullscreen-btn').hidden=!(document.fullscreenEnabled&&playPanel.requestFullscreen);
+    $('exit-play-btn').focus({preventScroll:true});
+  }
+  function exitPlayMode(){
+    if(!playSession)return;
+    const saved=playSession;playSession=null;clearInput();paused=true;
+    $('pause-btn').textContent='▶ 계속하기';
+    playPanel.classList.remove('play-screen');
+    if(saved.style===null)playPanel.removeAttribute('style');else playPanel.setAttribute('style',saved.style);
+    if(saved.scrollTop)document.documentElement.style.setProperty('--play-scroll-top',saved.scrollTop);
+    else document.documentElement.style.removeProperty('--play-scroll-top');
+    // Keep scroll-behavior:auto through restoration, despite the page's smooth scrolling.
+    document.documentElement.classList.remove('play-active');
+    function restorePosition(){
+      const root=document.documentElement,behavior=root.style.scrollBehavior;
+      root.style.scrollBehavior='auto';window.scrollTo(saved.x,saved.y);root.style.scrollBehavior=behavior;
+      saved.focus?.focus({preventScroll:true});
+    }
+    restorePosition();
+    if(fullscreenOwned&&document.fullscreenElement===playPanel){
+      document.exitFullscreen().then(()=>{if(!playSession)restorePosition();}).catch(()=>{});
+    }
+    fullscreenOwned=false;
+  }
+  async function requestPlayFullscreen(){
+    if(!playSession||!playPanel.requestFullscreen)return;
+    fullscreenOwned=true;
+    try{await playPanel.requestFullscreen();if(!playSession&&document.fullscreenElement===playPanel)await document.exitFullscreen();}
+    catch{fullscreenOwned=false;} // Viewport layout remains usable when denied or unsupported.
+    sizePlayScreen();clearInput();
+  }
   const PALETTE = {text:'#f7e9b5',hp:'#e68d72',xp:'#93d8bf'};
 
   function pseudo(seed) {
@@ -270,6 +347,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   function requiredXp(){return 30+(state.level-1)*15;}
   function updateUi(){
     const p=state.player,need=requiredXp(),completed=state.questDone;
+    $('play-stats').textContent=`Lv.${state.level} · HP ${Math.ceil(p.hp)}/100 · EXP ${state.xp}/${need} · 토벌 ${Math.min(3,state.kills)}/3`;
     $('level-text').textContent='LEVEL '+String(state.level).padStart(2,'0');
     $('hp-text').textContent=`${Math.ceil(p.hp)} / 100`;
     $('hp-bar').style.width=clamp(p.hp,0,100)+'%';
@@ -489,7 +567,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
           if(state.player.cool<=0){queuedAttack=null;attack();}
         }
       }
-      if(e.code==='Escape'){togglePause();e.preventDefault();}
+      if(e.code==='Escape'){if(playSession)exitPlayMode();else togglePause();e.preventDefault();}
     });
     window.addEventListener('keyup',e=>{recordKey(e);if(keyboard[e.key])keys.delete(keyboard[e.key]);attackKeys.delete(e.code);});
     window.addEventListener('blur',clearInput);
@@ -526,7 +604,14 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     ['pointerup','pointercancel','lostpointercapture'].forEach(type=>attackButton.addEventListener(type,e=>{
       if(e.pointerId===touch.attackId){if(type!=='pointerup')queuedAttack=null;releaseAttackPointer();}
     }));
-    window.addEventListener('resize',clearInput);
+    window.addEventListener('resize',()=>{clearInput();sizePlayScreen();});
+    window.visualViewport?.addEventListener('resize',()=>{clearInput();sizePlayScreen();});
+    window.visualViewport?.addEventListener('scroll',sizePlayScreen);
+    document.addEventListener('fullscreenchange',()=>{if(fullscreenOwned&&document.fullscreenElement!==playPanel)exitPlayMode();sizePlayScreen();});
+    $('play-mode-btn').addEventListener('click',enterPlayMode);
+    $('exit-play-btn').addEventListener('click',exitPlayMode);
+    $('exit-play-btn').addEventListener('pointerup',e=>{if(e.pointerType==='touch'){e.preventDefault();exitPlayMode();}});
+    $('fullscreen-btn').addEventListener('click',requestPlayFullscreen);
     if(screen.orientation?.addEventListener)screen.orientation.addEventListener('change',clearInput);
     $('reset-btn').addEventListener('click',reset);
     $('pause-btn').addEventListener('click',togglePause);
