@@ -36,7 +36,7 @@
           <div id="stage-loading" class="stage-loading" role="status">픽셀 그래픽을 불러오는 중…</div>
         </div>
         <div class="game-toolbar">
-          <div class="keyhint"><span class="keycap">W</span><span class="keycap">A</span><span class="keycap">S</span><span class="keycap">D</span> 이동 <span class="keycap widekey">SPACE</span> 검 공격</div>
+          <div class="keyhint"><span class="keycap">W</span><span class="keycap">A</span><span class="keycap">S</span><span class="keycap">D</span> 이동 <span class="keycap widekey">SPACE / J</span> 검 공격</div>
           <div class="toolbar-actions"><button type="button" id="pause-btn" class="tool-btn">Ⅱ 일시정지</button><button type="button" id="reset-btn" class="tool-btn tool-btn-bright">↻ 다시 시작</button></div>
         </div>
         <div class="mobile-controls" aria-label="터치 조작 버튼">
@@ -111,10 +111,12 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
   const $ = id => document.getElementById(id);
   const images = {};
   const keys = new Set();
+  const attackKeys = new Set();
+  let queuedAttack = null;
   const random = (a,b) => a + Math.random()*(b-a);
   const clamp = (x,min,max) => Math.max(min,Math.min(max,x));
   // Combat geometry is independent of the four-direction Ninja Adventure sprites.
-  const MELEE = Object.freeze({range:104, minDot:.10, duration:.24, cooldown:.39});
+  const MELEE = Object.freeze({range:104, minDot:.10, duration:.24, cooldown:.39, buffer:.13});
   function inputDirection(){
     const x=Number(keys.has('right'))-Number(keys.has('left'));
     const y=Number(keys.has('down'))-Number(keys.has('up'));
@@ -122,7 +124,7 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
     return length ? {x:x/length,y:y/length} : null;
   }
   function spriteFacing(direction){
-    return Math.abs(direction.x)>Math.abs(direction.y)
+    return Math.abs(direction.x)>=Math.abs(direction.y)
       ? (direction.x>0?'right':'left') : (direction.y>0?'down':'up');
   }
   function inStrike(strike,target){
@@ -227,7 +229,7 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
     $('quest-status').textContent=completed?'★ 퀘스트 완료 · 보상 획득':'● 퀘스트 진행 중';
   }
   function reset(){
-    keys.clear();
+    keys.clear();queuedAttack=null;
     tick=0;paused=false;$('pause-btn').textContent='Ⅱ 일시정지';
     state={player:{x:478,y:342,hp:100,invuln:0,attack:0,cool:0,face:'right',aim:{x:1,y:0},strike:null,walking:false,walkClock:0},enemies:[],effects:[],numbers:[],particles:[],kills:0,xp:0,level:1,questDone:false,spawnTimer:2.5,deathNotified:false};
     state.enemies=[newEnemy(627,342),newEnemy(353,416)];
@@ -244,11 +246,18 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
   }
   function burst(x,y,count,color){for(let i=0;i<count;i++)state.particles.push({x,y,vx:random(-110,110),vy:random(-145,42),life:random(.24,.55),maxLife:.55,color});}
   function popup(x,y,message,color){state.numbers.push({x,y,text:message,color,life:.72,vy:-32});}
-  function attack(){
+  function requestAttack(){
+    if(!started||paused||!state||state.player.hp<=0)return;
+    const direction={...(inputDirection()||state.player.aim)};
+    if(state.player.cool<=0){queuedAttack=null;attack(direction);}
+    else queuedAttack={direction,remaining:MELEE.buffer}; // One slot, never a combo queue.
+  }
+  function clearInput(){keys.clear();attackKeys.clear();queuedAttack=null;}
+  function attack(direction=inputDirection()){
     if(!started||paused||!state||state.player.hp<=0)return;
     const p=state.player;if(p.cool>0)return;
     // Sample held input here too: attacking can precede the next movement frame.
-    p.aim=inputDirection()||p.aim;
+    p.aim=direction||p.aim;
     p.face=spriteFacing(p.aim);
     p.attack=MELEE.duration;p.cool=MELEE.cooldown;
     const strike=p.strike={x:p.x,y:p.y,direction:{...p.aim}};
@@ -277,8 +286,18 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
   function update(dt){
     if(!state||paused||state.player.hp<=0)return;
     tick+=dt;const p=state.player;
+    const previousCool=p.cool;
     p.cool=Math.max(0,p.cool-dt);p.attack=Math.max(0,p.attack-dt);p.invuln=Math.max(0,p.invuln-dt);
     movement(dt);
+    if(queuedAttack){
+      // Resolve at the cooldown boundary, even if this frame crosses buffer expiry.
+      if(previousCool<=dt&&previousCool<=queuedAttack.remaining){
+        const direction=queuedAttack.direction;queuedAttack=null;attack(direction);
+      }else{
+        queuedAttack.remaining-=dt;
+        if(queuedAttack.remaining<=0)queuedAttack=null;
+      }
+    }
     for(const e of state.enemies){
       e.phase+=dt;e.hit=Math.max(0,e.hit-dt);e.knock=Math.max(0,e.knock-dt);
       const d=distance(e,p);
@@ -313,7 +332,7 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
     for(const n of state.numbers){n.y+=n.vy*dt;n.life-=dt;}
     state.numbers=state.numbers.filter(n=>n.life>0);
     if(p.hp<=0&&!state.deathNotified){
-      state.deathNotified=true;keys.clear();addLog('훈련 실패. 다시 시작을 눌러 재도전하세요.','hurt');
+      state.deathNotified=true;clearInput();addLog('훈련 실패. 다시 시작을 눌러 재도전하세요.','hurt');
     }
   }
   function drawProp(p){
@@ -392,7 +411,7 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
   }
   function togglePause(){
     if(!started||!state||state.player.hp<=0)return;
-    paused=!paused;keys.clear();
+    paused=!paused;keys.clear();queuedAttack=null;
     $('pause-btn').textContent=paused?'▶ 계속하기':'Ⅱ 일시정지';
     $('stage-indicator').textContent=paused?'Ⅱ  전투가 일시정지되었습니다':'⚔  훈련을 계속합니다';
   }
@@ -400,19 +419,23 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
     const keyboard={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',a:'left',s:'down',d:'right',W:'up',A:'left',S:'down',D:'right'};
     window.addEventListener('keydown',e=>{
       if(keyboard[e.key]){keys.add(keyboard[e.key]);e.preventDefault();}
-      if(e.code==='Space'){if(!e.repeat)attack();e.preventDefault();}
+      if(e.code==='Space'||e.code==='KeyJ'){
+        e.preventDefault();
+        if(!e.repeat&&!attackKeys.has(e.code))requestAttack();
+        attackKeys.add(e.code);
+      }
       if(e.code==='Escape'){togglePause();e.preventDefault();}
     });
-    window.addEventListener('keyup',e=>{if(keyboard[e.key])keys.delete(keyboard[e.key]);});
-    window.addEventListener('blur',()=>keys.clear());
-    document.addEventListener('visibilitychange',()=>{if(document.hidden){keys.clear();if(started&&!paused&&state.player.hp>0)togglePause();}});
+    window.addEventListener('keyup',e=>{if(keyboard[e.key])keys.delete(keyboard[e.key]);attackKeys.delete(e.code);});
+    window.addEventListener('blur',clearInput);
+    document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput();if(started&&!paused&&state.player.hp>0)togglePause();}});
     document.querySelectorAll('[data-dir]').forEach(btn=>{
       const direction=btn.dataset.dir;
       const up=()=>{keys.delete(direction);btn.classList.remove('pressed');};
       btn.addEventListener('pointerdown',e=>{e.preventDefault();keys.add(direction);btn.classList.add('pressed');btn.setPointerCapture(e.pointerId);});
       ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>btn.addEventListener(ev,up));
     });
-    $('attack-btn').addEventListener('pointerdown',e=>{e.preventDefault();attack();});
+    $('attack-btn').addEventListener('pointerdown',e=>{e.preventDefault();if(e.button===0)requestAttack();});
     $('reset-btn').addEventListener('click',reset);
     $('pause-btn').addEventListener('click',togglePause);
   }
