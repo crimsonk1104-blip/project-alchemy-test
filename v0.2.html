@@ -334,14 +334,17 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
     if(p.invuln>0&&Math.floor(p.invuln*14)%2===0)ctx.globalAlpha=.55;
     sprite(images[mode],idx*sw,row*sh,sw,sh,p.x-dw/2,p.y-dh+5,dw,dh);ctx.globalAlpha=1;
     if(p.attack>0){
-      // Lock the visual to the same origin and direction used for this hit.
+      // The ground sector records the instantaneous hit; the sword follows the body.
       const strike=p.strike,angle=Math.atan2(strike.direction.y,strike.direction.x);
       ctx.save();ctx.translate(strike.x,strike.y);ctx.rotate(angle);
       const halfAngle=Math.acos(MELEE.minDot);
       ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,MELEE.range,-halfAngle,halfAngle);ctx.closePath();
       ctx.fillStyle='rgba(255,235,164,.10)';ctx.fill();
       ctx.strokeStyle='rgba(255,235,164,.35)';ctx.lineWidth=1;ctx.stroke();
-      ctx.translate(37,0);
+      ctx.restore();
+      // Keep the Ninja Adventure slash at hand height while moving. Only its
+      // direction stays locked; damage was already resolved at strike.x/y.
+      ctx.save();ctx.translate(p.x,p.y-21);ctx.rotate(angle);ctx.translate(37,0);
       const fxCfg=CFG.sprites.slash;
       const frame=clamp(Math.floor((MELEE.duration-p.attack)*fxCfg.fps),0,fxCfg.frames-1);
       const [fw,fh]=fxCfg.size;

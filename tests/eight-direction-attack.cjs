@@ -36,10 +36,11 @@ const assert = require('node:assert/strict');
         g.attack();check(front.hp===2,'cooldown');
         g.keys.clear();g.keys.add('left');g.movement(.02);
         check(p.strike===strike&&strike.direction.x===dx&&strike.direction.y===dy,'locked strike');
-        // Canvas transform and sector must use the collision snapshot, even after moving.
+        // The hit sector stays at impact; the sword follows the moving body.
         const ctx=document.querySelector('#game').getContext('2d'),calls=[];
         const originals={};for(const name of ['translate','rotate','arc']){originals[name]=ctx[name];ctx[name]=function(...args){calls.push([name,...args]);return originals[name].apply(this,args);};}
         g.drawPlayer();for(const name in originals)ctx[name]=originals[name];
+        check(calls.some(c=>c[0]==='translate'&&c[1]===p.x&&c[2]===p.y-21),'sword follows body');
         check(calls.some(c=>c[0]==='translate'&&c[1]===strike.x&&c[2]===strike.y),'effect origin');
         check(calls.some(c=>c[0]==='rotate'&&c[1]===Math.atan2(dy,dx)),'effect angle');
         check(calls.some(c=>c[0]==='arc'&&c[3]===g.MELEE.range&&c[4]===-Math.acos(g.MELEE.minDot)),'effect range');
@@ -49,10 +50,16 @@ const assert = require('node:assert/strict');
       g.update(.4);g.keys.clear();g.attack();check(Math.abs(g.state.player.strike.direction.y+Math.SQRT1_2)<1e-12,'idle aim');
       g.reset();
       for(let i=0;i<3;i++){
-        const p=g.state.player,e=g.newEnemy(p.x+65,p.y);e.hp=1;g.state.enemies=[e];p.cool=0;g.attack();g.update(.01);
+        const p=g.state.player,e=g.newEnemy(p.x+65,p.y);g.state.enemies=[e];
+        for(let hit=0;hit<3;hit++){
+          e.x=p.x+65;e.y=p.y;p.cool=0;g.attack();g.update(.01);
+          check(e.hp===2-hit,'three-hit slime combat');
+        }
       }
       check(g.state.kills===3&&g.state.questDone&&g.state.level===2&&g.state.xp===15,'kills/xp/level/quest');
       g.reset();const p=g.state.player;g.state.enemies=[g.newEnemy(p.x+30,p.y)];g.update(.01);check(p.hp===91,'slime damage');
+      g.update(.1);check(p.hp===91,'damage invulnerability');
+      g.reset();check(g.state.player.hp===100&&g.state.kills===0&&g.state.xp===0&&g.state.level===1&&!g.state.questDone,'restart');
       return {directions:8,checks:'speed, hits, misses, range, knockback, cooldown, locked effect geometry, immediate input, idle aim, progression, slime damage'};
     });
     assert.deepEqual(errors,[]);
