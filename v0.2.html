@@ -8,11 +8,53 @@
   <title>PROJECT ALCHEMY · 연금술사의 숲 · v0.2</title>
   <style>
 :root{--bg:#0c171d;--bg2:#15252c;--panel:#17272f;--panel-2:#1e3137;--line:#355057;--text:#eff4e5;--muted:#a9bfb9;--gold:#e7c584;--mint:#8cdaa9;--red:#e78980;--blue:#93bbdf}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);font-family:system-ui,-apple-system,"Pretendard","Malgun Gothic",sans-serif;background:radial-gradient(ellipse at 18% -10%,#254138 0%,transparent 37%),radial-gradient(ellipse at 88% 20%,#193642 0%,transparent 33%),var(--bg);min-height:100vh}button{font:inherit;cursor:pointer}button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}.app{max-width:1500px;padding:26px clamp(12px,3vw,40px) 22px;margin:auto}.masthead{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-bottom:24px;border-bottom:1px solid #344b4b}.brand-wrap{display:flex;gap:17px;align-items:center}.brand-symbol{width:52px;height:52px;border:1px solid #547267;background:#253d3b;display:grid;place-items:center;border-radius:16px;font-size:29px;color:var(--gold);box-shadow:0 0 0 4px #172b2b}.eyebrow{font-size:10px;letter-spacing:.14em;color:#9ce2c3;font-weight:800}.masthead h1{font-family:Georgia,"Malgun Gothic",serif;font-size:clamp(23px,2.6vw,31px);line-height:1.2;letter-spacing:-.04em;margin:6px 0 0;font-weight:800}.h1-sub{font-size:.58em;color:#9bbab1;font-family:system-ui;font-weight:500;letter-spacing:-.03em}.masthead-tags{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.chip{border:1px solid #415c58;border-radius:30px;padding:10px 13px;color:#c4d8cd;font-size:11px;white-space:nowrap;letter-spacing:.04em}.chip-online{background:#213e39;color:#b8e2c1;border-color:#4d7864}.live-dot{width:7px;height:7px;background:#91dca3;display:inline-block;border-radius:50%;box-shadow:0 0 9px #7bdca2;margin-right:7px}.hero-copy{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:24px 0 20px}.hero-overline{font-size:11px;font-weight:800;letter-spacing:.19em;color:var(--gold)}.hero-overline span{color:#517a69;margin:0 5px}.hero-copy p{margin:0;font-size:12px;color:#b0c5c0}.main-grid{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:19px;align-items:start}.game-panel{border:1px solid #527466;border-radius:16px;overflow:hidden;background:#102326;box-shadow:0 20px 70px #0007,0 0 0 5px #172b2d}.panel-topline{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 17px;background:#213630;color:#f2d89e;font-weight:800;letter-spacing:.09em;font-size:11px;border-bottom:2px solid #527363}.golden-star{font-size:16px;margin-right:9px}.topline-right{display:flex;gap:19px;align-items:center;font-weight:600;color:#bdd2c9;letter-spacing:.03em}.map-coord{font-size:10px;color:#7fb4a0}.test-light{font-size:11px}.test-light span{display:inline-block;background:#81d9a2;width:6px;height:6px;border-radius:50%;margin-right:4px}.stage-wrap{position:relative;overflow:hidden;background:#365a3e}.stage-wrap canvas{display:block;width:100%;height:auto;aspect-ratio:5/3;image-rendering:pixelated;touch-action:none}.stage-hud{position:absolute;top:17px;z-index:2;color:#f9f4d9;background:linear-gradient(90deg,#102a2de8,#112b2bce);border:1px solid #7390717a;padding:10px 14px;border-radius:3px;box-shadow:0 6px 12px #0c201b64;pointer-events:none}.stage-hud-left{left:17px}.stage-hud-right{right:17px;text-align:right;background:linear-gradient(270deg,#102a2de8,#112b2bce)}.hud-label{font-size:9px;letter-spacing:.18em;color:#a4c1ad;font-weight:800}.stage-hud strong{display:block;font-size:16px;margin:3px 0 2px}.stage-hud small,.stage-hud span{font-size:11px;color:#c5dec6}.stage-hud-right b{color:#f3d187}.stage-bottom-label{position:absolute;left:14px;bottom:13px;padding:8px 12px;background:#152c2ddf;color:#e8d9b0;font-weight:700;letter-spacing:.01em;font-size:12px;border-left:3px solid #e2c786;border-radius:2px;pointer-events:none}.stage-loading{display:flex;justify-content:center;align-items:center;position:absolute;inset:0;background:#14262be8;color:#e3d3a9;font-weight:800;z-index:4}.stage-loading.hidden{display:none}.game-toolbar{background:#192e32;padding:13px 17px;display:flex;align-items:center;justify-content:space-between;gap:14px;border-top:2px solid #527363}.keyhint{color:#bed2c9;font-size:12px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}.keycap{min-width:24px;display:inline-grid;place-items:center;padding:4px 6px;border:1px solid #789184;border-bottom:3px solid #789184;background:#314c49;color:#f5f3df;border-radius:4px;font-size:10px;font-weight:900}.keycap:nth-of-type(4){margin-right:7px}.widekey{min-width:58px;margin-left:8px}.toolbar-actions{display:flex;gap:8px;align-items:center}.tool-btn{border:1px solid #55746c;border-radius:8px;background:#25413e;color:#d5e9dd;padding:9px 12px;font-size:11px;font-weight:700;white-space:nowrap}.tool-btn:hover{background:#355d54}.tool-btn-bright{border-color:#8a7752;color:#efd4a2;background:#443f30}.tool-btn-bright:hover{background:#5c5038}.sidebar{display:flex;flex-direction:column;gap:15px}.info-card{background:linear-gradient(150deg,#21373a,#16282f);border:1px solid #486660;border-radius:12px;padding:17px;box-shadow:0 10px 25px #06111650}.section-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}.section-kicker{font-size:10px;color:#a4cabb;font-weight:800;letter-spacing:.12em}.rarity-tag,.quest-badge{border:1px solid #917e58;background:#3a3b2c;color:#e7c78b;font-size:9px;padding:4px 7px;border-radius:3px;font-weight:800}.character-summary{display:flex;gap:13px;align-items:center}.portrait-frame{width:70px;height:70px;flex:0 0 auto;border-radius:8px;border:2px solid #7d936e;background:linear-gradient(150deg,#406457,#243b39);display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 0 0 5px #243e37}.portrait-frame img{width:64px;height:64px;object-fit:cover;image-rendering:pixelated}.character-title{font-weight:900;font-size:18px;letter-spacing:-.05em}.level-chip{color:#f8d388;font-size:12px;font-weight:900;margin:5px 0}.caption{color:#a6c0b7;font-size:10px;line-height:1.5}.stat-header{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin:21px 0 8px;color:#eeeada;font-weight:700}.stat-header strong{font-size:12px;font-weight:800}.stat-header small{font-size:10px;color:#95b2a8;margin-left:4px}.xp-head{margin-top:16px}.meter{height:11px;background:#0f2029;border:1px solid #37544f;border-radius:30px;overflow:hidden}.meter-fill{height:100%;width:100%;transition:width .18s ease}.hp-fill{background:linear-gradient(90deg,#b95653,#f5a17f)}.xp-fill{background:linear-gradient(90deg,#518e9d,#86d9c3)}.demo-caption{margin-top:16px;border-top:1px solid #3d5551;padding-top:11px;font-size:10px;color:#94b1aa}.quest-entry{display:flex;gap:10px;align-items:flex-start}.quest-gem{color:#f1c879;background:#3d3c2c;width:30px;height:30px;border:1px solid #705d3e;border-radius:6px;display:grid;place-items:center;flex:none}.quest-entry h2,.record-card h2{font-size:15px;margin:0;font-weight:900}.quest-entry p{font-size:11px;line-height:1.6;color:#b2c9c2;margin:7px 0 0}.quest-progress-row{display:flex;justify-content:space-between;margin:20px 0 8px;color:#b5ccc2;font-size:11px}.quest-progress-row span:last-child{color:#e3d0a2;font-weight:900}.quest-progress{height:7px;border-radius:10px;background:#12252a;overflow:hidden}.quest-progress div{height:100%;width:0;background:linear-gradient(90deg,#6aaf78,#c2db7b);transition:width .2s}.reward-line{font-size:11px;color:#a0b7a9;margin-top:16px;display:flex;justify-content:space-between}.reward-line strong{color:#e9cb86}.quest-status{border-top:1px solid #3e5751;color:#bed0a1;font-size:11px;font-weight:800;margin-top:15px;padding-top:12px}.record-card h2{margin-bottom:12px}.record-symbol{font-size:19px;color:#b2c9ba}.log-items{display:flex;flex-direction:column;gap:10px;min-height:86px}.log-line{border-left:2px solid #567c65;padding:3px 0 3px 10px;font-size:11px;line-height:1.7;color:#c7d6ca}.log-line.highlight{border-color:#e3bf78;color:#f1d4a0}.log-line.hurt{border-color:#d87574;color:#ecc4b8}.small-notice{display:flex;gap:11px;padding:15px 14px;border:1px solid #4f6963;background:#172b2b;border-radius:11px;color:#abc8b9}.notice-icon{color:#bde4bd;font-size:18px}.small-notice strong{color:#cfdfc9;font-size:12px}.small-notice p{font-size:11px;line-height:1.7;margin:5px 0 0}.footer{margin-top:24px;padding-top:15px;border-top:1px solid #3a4e4c;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;color:#82a19a;font-size:10px;letter-spacing:.1em}.mobile-controls{display:flex;gap:36px;align-items:center;justify-content:center;padding:14px 0 18px;background:#14272a;touch-action:none}.dpad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,43px);gap:4px}.dpad button{border:1px solid #668a7d;background:#294944;color:#e3eee4;border-radius:7px;font-size:17px;font-weight:900;touch-action:none;user-select:none}.dpad button.pressed,.dpad button:active{background:#51836a}.action-stack{display:flex;flex-direction:column;align-items:center;gap:6px}.action-stack>span{font-size:9px;color:#8aab9b;letter-spacing:.18em;font-weight:800}.attack-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:99px;height:88px;border:2px solid #b98e61;border-radius:13px;color:#fff0cc;background:radial-gradient(circle at 35% 20%,#9b6953,#62433c);font-size:27px;font-weight:900;touch-action:none;user-select:none;box-shadow:0 5px 0 #412d2b}.attack-btn small{font-size:10px;letter-spacing:.13em}.attack-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #412d2b}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);font-family:system-ui,-apple-system,"Pretendard","Malgun Gothic",sans-serif;background:radial-gradient(ellipse at 18% -10%,#254138 0%,transparent 37%),radial-gradient(ellipse at 88% 20%,#193642 0%,transparent 33%),var(--bg);min-height:100vh}button{font:inherit;cursor:pointer}button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}.app{max-width:1500px;padding:26px clamp(12px,3vw,40px) 22px;margin:auto}.masthead{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-bottom:24px;border-bottom:1px solid #344b4b}.brand-wrap{display:flex;gap:17px;align-items:center}.brand-symbol{width:52px;height:52px;border:1px solid #547267;background:#253d3b;display:grid;place-items:center;border-radius:16px;font-size:29px;color:var(--gold);box-shadow:0 0 0 4px #172b2b}.eyebrow{font-size:10px;letter-spacing:.14em;color:#9ce2c3;font-weight:800}.masthead h1{font-family:Georgia,"Malgun Gothic",serif;font-size:clamp(23px,2.6vw,31px);line-height:1.2;letter-spacing:-.04em;margin:6px 0 0;font-weight:800}.h1-sub{font-size:.58em;color:#9bbab1;font-family:system-ui;font-weight:500;letter-spacing:-.03em}.masthead-tags{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.chip{border:1px solid #415c58;border-radius:30px;padding:10px 13px;color:#c4d8cd;font-size:11px;white-space:nowrap;letter-spacing:.04em}.chip-online{background:#213e39;color:#b8e2c1;border-color:#4d7864}.live-dot{width:7px;height:7px;background:#91dca3;display:inline-block;border-radius:50%;box-shadow:0 0 9px #7bdca2;margin-right:7px}.hero-copy{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:24px 0 20px}.hero-overline{font-size:11px;font-weight:800;letter-spacing:.19em;color:var(--gold)}.hero-overline span{color:#517a69;margin:0 5px}.hero-copy p{margin:0;font-size:12px;color:#b0c5c0}.main-grid{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:19px;align-items:start}.game-panel{border:1px solid #527466;border-radius:16px;overflow:hidden;background:#102326;box-shadow:0 20px 70px #0007,0 0 0 5px #172b2d}.panel-topline{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 17px;background:#213630;color:#f2d89e;font-weight:800;letter-spacing:.09em;font-size:11px;border-bottom:2px solid #527363}.golden-star{font-size:16px;margin-right:9px}.topline-right{display:flex;gap:19px;align-items:center;font-weight:600;color:#bdd2c9;letter-spacing:.03em}.map-coord{font-size:10px;color:#7fb4a0}.test-light{font-size:11px}.test-light span{display:inline-block;background:#81d9a2;width:6px;height:6px;border-radius:50%;margin-right:4px}.stage-wrap{position:relative;overflow:hidden;background:#365a3e}.stage-wrap canvas{display:block;width:100%;height:auto;aspect-ratio:5/3;image-rendering:pixelated;touch-action:none}.stage-hud{position:absolute;top:17px;z-index:2;color:#f9f4d9;background:linear-gradient(90deg,#102a2de8,#112b2bce);border:1px solid #7390717a;padding:10px 14px;border-radius:3px;box-shadow:0 6px 12px #0c201b64;pointer-events:none}.stage-hud-left{left:17px}.stage-hud-right{right:17px;text-align:right;background:linear-gradient(270deg,#102a2de8,#112b2bce)}.hud-label{font-size:9px;letter-spacing:.18em;color:#a4c1ad;font-weight:800}.stage-hud strong{display:block;font-size:16px;margin:3px 0 2px}.stage-hud small,.stage-hud span{font-size:11px;color:#c5dec6}.stage-hud-right b{color:#f3d187}.stage-bottom-label{position:absolute;left:14px;bottom:13px;padding:8px 12px;background:#152c2ddf;color:#e8d9b0;font-weight:700;letter-spacing:.01em;font-size:12px;border-left:3px solid #e2c786;border-radius:2px;pointer-events:none}.stage-loading{display:flex;justify-content:center;align-items:center;position:absolute;inset:0;background:#14262be8;color:#e3d3a9;font-weight:800;z-index:4}.stage-loading.hidden{display:none}.game-toolbar{background:#192e32;padding:13px 17px;display:flex;align-items:center;justify-content:space-between;gap:14px;border-top:2px solid #527363}.keyhint{color:#bed2c9;font-size:12px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}.keycap{min-width:24px;display:inline-grid;place-items:center;padding:4px 6px;border:1px solid #789184;border-bottom:3px solid #789184;background:#314c49;color:#f5f3df;border-radius:4px;font-size:10px;font-weight:900}.keycap:nth-of-type(4){margin-right:7px}.widekey{min-width:58px;margin-left:8px}.toolbar-actions{display:flex;gap:8px;align-items:center}.tool-btn{border:1px solid #55746c;border-radius:8px;background:#25413e;color:#d5e9dd;padding:9px 12px;font-size:11px;font-weight:700;white-space:nowrap}.tool-btn:hover{background:#355d54}.tool-btn-bright{border-color:#8a7752;color:#efd4a2;background:#443f30}.tool-btn-bright:hover{background:#5c5038}.sidebar{display:flex;flex-direction:column;gap:15px}.info-card{background:linear-gradient(150deg,#21373a,#16282f);border:1px solid #486660;border-radius:12px;padding:17px;box-shadow:0 10px 25px #06111650}.section-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}.section-kicker{font-size:10px;color:#a4cabb;font-weight:800;letter-spacing:.12em}.rarity-tag,.quest-badge{border:1px solid #917e58;background:#3a3b2c;color:#e7c78b;font-size:9px;padding:4px 7px;border-radius:3px;font-weight:800}.character-summary{display:flex;gap:13px;align-items:center}.portrait-frame{width:70px;height:70px;flex:0 0 auto;border-radius:8px;border:2px solid #7d936e;background:linear-gradient(150deg,#406457,#243b39);display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 0 0 5px #243e37}.portrait-frame img{width:64px;height:64px;object-fit:cover;image-rendering:pixelated}.character-title{font-weight:900;font-size:18px;letter-spacing:-.05em}.level-chip{color:#f8d388;font-size:12px;font-weight:900;margin:5px 0}.caption{color:#a6c0b7;font-size:10px;line-height:1.5}.stat-header{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin:21px 0 8px;color:#eeeada;font-weight:700}.stat-header strong{font-size:12px;font-weight:800}.stat-header small{font-size:10px;color:#95b2a8;margin-left:4px}.xp-head{margin-top:16px}.meter{height:11px;background:#0f2029;border:1px solid #37544f;border-radius:30px;overflow:hidden}.meter-fill{height:100%;width:100%;transition:width .18s ease}.hp-fill{background:linear-gradient(90deg,#b95653,#f5a17f)}.xp-fill{background:linear-gradient(90deg,#518e9d,#86d9c3)}.demo-caption{margin-top:16px;border-top:1px solid #3d5551;padding-top:11px;font-size:10px;color:#94b1aa}.quest-entry{display:flex;gap:10px;align-items:flex-start}.quest-gem{color:#f1c879;background:#3d3c2c;width:30px;height:30px;border:1px solid #705d3e;border-radius:6px;display:grid;place-items:center;flex:none}.quest-entry h2,.record-card h2{font-size:15px;margin:0;font-weight:900}.quest-entry p{font-size:11px;line-height:1.6;color:#b2c9c2;margin:7px 0 0}.quest-progress-row{display:flex;justify-content:space-between;margin:20px 0 8px;color:#b5ccc2;font-size:11px}.quest-progress-row span:last-child{color:#e3d0a2;font-weight:900}.quest-progress{height:7px;border-radius:10px;background:#12252a;overflow:hidden}.quest-progress div{height:100%;width:0;background:linear-gradient(90deg,#6aaf78,#c2db7b);transition:width .2s}.reward-line{font-size:11px;color:#a0b7a9;margin-top:16px;display:flex;justify-content:space-between}.reward-line strong{color:#e9cb86}.quest-status{border-top:1px solid #3e5751;color:#bed0a1;font-size:11px;font-weight:800;margin-top:15px;padding-top:12px}.record-card h2{margin-bottom:12px}.record-symbol{font-size:19px;color:#b2c9ba}.log-items{display:flex;flex-direction:column;gap:10px;min-height:86px}.log-line{border-left:2px solid #567c65;padding:3px 0 3px 10px;font-size:11px;line-height:1.7;color:#c7d6ca}.log-line.highlight{border-color:#e3bf78;color:#f1d4a0}.log-line.hurt{border-color:#d87574;color:#ecc4b8}.small-notice{display:flex;gap:11px;padding:15px 14px;border:1px solid #4f6963;background:#172b2b;border-radius:11px;color:#abc8b9}.notice-icon{color:#bde4bd;font-size:18px}.small-notice strong{color:#cfdfc9;font-size:12px}.small-notice p{font-size:11px;line-height:1.7;margin:5px 0 0}.footer{margin-top:24px;padding-top:15px;border-top:1px solid #3a4e4c;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;color:#82a19a;font-size:10px;letter-spacing:.1em}.mobile-controls{display:flex;gap:36px;align-items:center;justify-content:space-between;padding:16px 28px 22px;background:#14272a;touch-action:none;user-select:none;-webkit-user-select:none}.action-stack{display:flex;flex-direction:column;align-items:center;gap:6px}.action-stack>span{font-size:9px;color:#8aab9b;letter-spacing:.18em;font-weight:800}.attack-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:99px;height:88px;border:2px solid #b98e61;border-radius:13px;color:#fff0cc;background:radial-gradient(circle at 35% 20%,#9b6953,#62433c);font-size:27px;font-weight:900;touch-action:none;user-select:none;box-shadow:0 5px 0 #412d2b}.attack-btn small{font-size:10px;letter-spacing:.13em}.attack-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #412d2b}
 @media(max-width:1130px){.main-grid{grid-template-columns:minmax(0,1fr) 285px}.sidebar{gap:12px}.game-toolbar{flex-wrap:wrap}}
 @media(max-width:920px){.main-grid{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.record-card,.small-notice{grid-column:auto}.stage-wrap{max-width:100%}}
 @media(max-width:620px){.app{padding:13px 11px 24px}.masthead{align-items:flex-start;flex-wrap:wrap;gap:14px;padding-bottom:15px}.brand-symbol{width:42px;height:42px;font-size:24px}.brand-wrap{gap:11px}.masthead h1{font-size:23px}.h1-sub{display:block;margin-top:6px;font-size:12px}.masthead-tags{margin-left:50px}.chip{font-size:9px;padding:7px 9px}.hero-copy{padding:17px 0}.hero-copy p{line-height:1.6}.panel-topline{padding:11px 12px;font-size:9px}.map-coord{display:none}.stage-hud{padding:6px 8px;top:9px}.stage-hud-left{left:8px}.stage-hud-right{right:8px}.hud-label{font-size:7px}.stage-hud strong{font-size:11px}.stage-hud small,.stage-hud span{font-size:8px}.stage-bottom-label{font-size:9px;left:8px;bottom:6px;padding:5px 7px}.game-toolbar{padding:10px;gap:12px}.keyhint{font-size:10px}.toolbar-actions{width:100%;justify-content:flex-end}.sidebar{grid-template-columns:1fr}.footer{line-height:1.6}.mobile-controls{gap:24px}}
 
+/* Fixed thumb joystick; controls stay in layout, never cover the game. */
+.joystick{position:relative;flex:none;width:132px;height:132px;border-radius:50%;border:2px solid #668a7d;background:radial-gradient(circle,#294944 0 20%,#1a3434 21% 55%,#35584d 56% 58%,#18322f 59%);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.joystick::before{content:'이동';position:absolute;inset:8px 0 auto;text-align:center;font-size:11px;color:#a9bfb9}
+.joystick-knob{position:absolute;width:52px;height:52px;left:calc(50% - 26px);top:calc(50% - 26px);border-radius:50%;border:2px solid #a3cdb4;background:radial-gradient(circle at 35% 25%,#68977e,#345c4d);box-shadow:0 4px 9px #0005;pointer-events:none}
+.joystick.active{border-color:var(--mint)}
+.action-stack{flex:none}.action-stack>span{letter-spacing:.04em}
+@media(max-width:620px){.mobile-controls{padding:12px 20px 18px}.joystick{width:120px;height:120px}.stage-hud{transform:scale(.78);transform-origin:top left}.stage-hud-right{transform-origin:top right}}
+@media(orientation:portrait) and (max-width:620px) and (max-height:740px){.hero-copy,.masthead-tags,.keyhint{display:none}.masthead{padding-bottom:8px;gap:6px}.h1-sub{display:none}.game-toolbar{padding:6px 10px}}
+@media(orientation:landscape) and (max-height:900px) and (max-width:1200px){
+.app{padding:8px}.masthead,.hero-copy{display:none}.main-grid{grid-template-columns:1fr}.game-panel{display:grid;grid-template-columns:112px minmax(0,1fr) 112px}.panel-topline{grid-column:1/-1;padding:6px 10px}.stage-wrap{grid-column:2;grid-row:2}.stage-wrap canvas{max-height:calc(100svh - 110px);object-fit:contain}.stage-hud{display:none}.stage-bottom-label{font-size:10px;left:6px;bottom:6px;padding:4px;max-width:calc(100% - 12px)}.mobile-controls{display:contents}.joystick{grid-column:1;grid-row:2;align-self:center;justify-self:center;width:100px;height:100px}.action-stack{grid-column:3;grid-row:2;align-self:center;justify-self:center}.attack-btn{width:88px;height:82px}.game-toolbar{grid-row:3;grid-column:1/-1;padding:6px 10px}.keyhint{display:none}.sidebar{margin-top:12px}
+}
+/* Dedicated viewport: only game controls suppress touch gestures. */
+html.play-active{overflow:hidden;overscroll-behavior-y:none;scroll-behavior:auto}
+.play-active body{position:fixed;top:var(--play-scroll-top);left:0;width:100%;overflow:hidden;overscroll-behavior-y:none}
+.play-active .app>:not(.main-grid),.play-active .sidebar{display:none}
+.game-panel.play-screen{position:fixed;z-index:1000;left:var(--play-left,0px);top:var(--play-top,0px);width:var(--play-width,100vw);height:var(--play-height,100dvh);margin:0;border-radius:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overflow:hidden;overscroll-behavior-y:none;background:#101f23;touch-action:manipulation}
+.game-panel.play-screen:fullscreen{left:0;top:0;width:100%;height:100%}
+.play-screen .panel-topline,.play-screen .keyhint,.play-screen #play-mode-btn{display:none}
+.play-screen .game-toolbar{grid-column:1;grid-row:1;display:flex;flex-wrap:wrap;padding:6px 10px;gap:6px;min-width:0}
+.play-screen .toolbar-actions{display:flex;flex-wrap:wrap;gap:5px}
+.play-screen .tool-btn{touch-action:manipulation;padding:7px 9px;min-height:36px}
+#play-stats{display:none;font-size:12px;line-height:1.5}
+.play-screen #play-stats{display:block}
+.play-screen .stage-wrap{grid-column:1;grid-row:2;min-height:0;min-width:0;width:100%;height:100%;touch-action:pinch-zoom}
+.play-screen .stage-wrap canvas{display:block;width:100%;height:100%;max-height:none;aspect-ratio:auto;object-fit:contain;touch-action:pinch-zoom}
+.play-screen .stage-hud{display:none}
+.play-screen .mobile-controls{grid-column:1;grid-row:3;display:flex;align-items:center;justify-content:space-between;padding:8px max(20px,env(safe-area-inset-left)) 12px;gap:20px;touch-action:auto}
+.play-screen .joystick{width:clamp(94px,18dvh,132px);height:clamp(94px,18dvh,132px)}
+.play-screen .action-stack{align-self:center}
+.play-screen .attack-btn{width:94px;height:82px}
+.play-screen .stage-bottom-label{font-size:11px;left:8px;bottom:8px;max-width:calc(100% - 16px);padding:5px}
+#fullscreen-btn,#exit-play-btn{display:none}
+.play-screen #exit-play-btn{display:inline-block}
+.play-screen #fullscreen-btn:not([hidden]){display:inline-block}
+@media(orientation:landscape){
+.game-panel.play-screen{grid-template-columns:112px minmax(0,1fr) 112px;grid-template-rows:auto minmax(0,1fr)}
+.play-screen .game-toolbar{grid-column:1/-1}
+.play-screen .stage-wrap{grid-column:2;grid-row:2}
+.play-screen .mobile-controls{display:contents}
+.play-screen .joystick{width:100px;height:100px;grid-column:1;grid-row:2;align-self:end;justify-self:center;margin-bottom:12px}
+.play-screen .action-stack{grid-column:3;grid-row:2;align-self:end;justify-self:center;margin-bottom:12px}
+}
 </style>
 </head>
 <body>
@@ -37,11 +79,11 @@
         </div>
         <div class="game-toolbar">
           <div class="keyhint"><span class="keycap">W</span><span class="keycap">A</span><span class="keycap">S</span><span class="keycap">D</span> 이동 <span class="keycap widekey">SPACE / J</span> 누르고 있으면 연속 공격</div>
-          <div class="toolbar-actions"><button type="button" id="pause-btn" class="tool-btn">Ⅱ 일시정지</button><button type="button" id="reset-btn" class="tool-btn tool-btn-bright">↻ 다시 시작</button></div>
+          <output id="play-stats" aria-label="전투 상태"></output><div class="toolbar-actions"><button type="button" class="tool-btn tool-btn-bright" id="play-mode-btn">게임 시작 · 전용 화면</button><button type="button" class="tool-btn" id="fullscreen-btn" hidden>전체 화면</button><button type="button" class="tool-btn" id="exit-play-btn">플레이 종료</button><button type="button" id="pause-btn" class="tool-btn">Ⅱ 일시정지</button><button type="button" id="reset-btn" class="tool-btn tool-btn-bright">↻ 다시 시작</button></div>
         </div>
         <div class="mobile-controls" aria-label="터치 조작 버튼">
-          <div class="dpad" aria-label="방향키"><div></div><button data-dir="up" aria-label="위로 이동" type="button">▲</button><div></div><button data-dir="left" aria-label="왼쪽 이동" type="button">◀</button><button data-dir="down" aria-label="아래로 이동" type="button">▼</button><button data-dir="right" aria-label="오른쪽 이동" type="button">▶</button></div>
-          <div class="action-stack"><span>TRAINING ACTION</span><button id="attack-btn" class="attack-btn" type="button">⚔<small>ATTACK</small></button></div>
+          <div id="joystick" class="joystick" role="group" aria-label="가상 조이스틱: 드래그하여 이동"><div id="joystick-knob" class="joystick-knob"></div></div>
+          <div class="action-stack"><span>터치 1회 공격</span><button id="attack-btn" class="attack-btn" type="button">⚔<small>ATTACK</small></button></div>
         </div>
       </section>
       <aside class="sidebar" aria-label="캐릭터 및 퀘스트 정보">
@@ -112,6 +154,17 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
   const images = {};
   const keys = new Set();
   const attackKeys = new Set();
+  const touch={pointerId:null,x:0,y:0,attackId:null};
+  const JOYSTICK_DEADZONE=.18;
+  function releaseJoystick(){
+    const id=touch.pointerId;touch.pointerId=null;touch.x=0;touch.y=0;
+    $('joystick').classList.remove('active');$('joystick-knob').style.transform='';
+    if(id!==null&&$('joystick').hasPointerCapture(id))$('joystick').releasePointerCapture(id);
+  }
+  function releaseAttackPointer(){
+    const id=touch.attackId;touch.attackId=null;
+    if(id!==null&&$('attack-btn').hasPointerCapture(id))$('attack-btn').releasePointerCapture(id);
+  }
   let queuedAttack = null; // Pointer taps only; keyboard attacks follow held state.
   const inputDebug = new URLSearchParams(location.search).get('inputDebug')==='1';
   const diagnostic={down:0,up:0,repeats:0,last:'없음',attacks:0,result:'없음',keyEvents:{Space:{down:0,up:0},KeyJ:{down:0,up:0}}};
@@ -129,6 +182,7 @@ keydown ${diagnostic.down} / keyup ${diagnostic.up} / repeat ${diagnostic.repeat
 Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Space.up} / J 수신: ↓${diagnostic.keyEvents.KeyJ.down} ↑${diagnostic.keyEvents.KeyJ.up}
 공격키 유지: ${[...attackKeys].join(', ')||'없음'}
 이동 입력: ${[...keys].join(', ')||'없음'}
+조이스틱: ${touch.pointerId??'없음'} / (${touch.x.toFixed(2)}, ${touch.y.toFixed(2)}) / 공격 포인터: ${touch.attackId??'없음'}
 쿨다운: ${(state?.player.cool||0).toFixed(3)}초 / 간격 ${MELEE.cooldown}초
 실제 공격: ${diagnostic.attacks}회 / 결과: ${diagnostic.result}
 상태: ${paused?'일시정지':state?.player.hp<=0?'사망':'실행 중'}`;
@@ -145,6 +199,8 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   // Combat geometry is independent of the four-direction Ninja Adventure sprites.
   const MELEE = Object.freeze({range:104, minDot:.10, duration:.24, cooldown:.39, buffer:.13});
   function inputDirection(){
+    // A captured joystick owns movement until released; keyboard state is separate.
+    if(touch.pointerId!==null)return touch.x||touch.y?{x:touch.x,y:touch.y}:null;
     const x=Number(keys.has('right'))-Number(keys.has('left'));
     const y=Number(keys.has('down'))-Number(keys.has('up'));
     const length=Math.hypot(x,y);
@@ -180,6 +236,52 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   let paused = false;
   let started = false;
   const messages = [];
+  const playPanel=document.querySelector('.game-panel');
+  let playSession=null,fullscreenOwned=false;
+  function sizePlayScreen(){
+    if(!playSession)return;
+    const v=window.visualViewport;
+    const values={'--play-left':(v?.offsetLeft||0)+'px','--play-top':(v?.offsetTop||0)+'px','--play-width':(v?.width||innerWidth)+'px','--play-height':(v?.height||innerHeight)+'px'};
+    for(const [name,value] of Object.entries(values))playPanel.style.setProperty(name,value);
+  }
+  function enterPlayMode(){
+    if(playSession||!started)return;
+    clearInput();
+    playSession={x:scrollX,y:scrollY,focus:document.activeElement,style:playPanel.getAttribute('style'),scrollTop:document.documentElement.style.getPropertyValue('--play-scroll-top')};
+    document.documentElement.style.setProperty('--play-scroll-top',-playSession.y+'px');
+    document.documentElement.classList.add('play-active');playPanel.classList.add('play-screen');
+    sizePlayScreen();paused=false;$('pause-btn').textContent='Ⅱ 일시정지';
+    $('fullscreen-btn').hidden=!(document.fullscreenEnabled&&playPanel.requestFullscreen);
+    $('exit-play-btn').focus({preventScroll:true});
+  }
+  function exitPlayMode(){
+    if(!playSession)return;
+    const saved=playSession;playSession=null;clearInput();paused=true;
+    $('pause-btn').textContent='▶ 계속하기';
+    playPanel.classList.remove('play-screen');
+    if(saved.style===null)playPanel.removeAttribute('style');else playPanel.setAttribute('style',saved.style);
+    if(saved.scrollTop)document.documentElement.style.setProperty('--play-scroll-top',saved.scrollTop);
+    else document.documentElement.style.removeProperty('--play-scroll-top');
+    // Keep scroll-behavior:auto through restoration, despite the page's smooth scrolling.
+    document.documentElement.classList.remove('play-active');
+    function restorePosition(){
+      const root=document.documentElement,behavior=root.style.scrollBehavior;
+      root.style.scrollBehavior='auto';window.scrollTo(saved.x,saved.y);root.style.scrollBehavior=behavior;
+      saved.focus?.focus({preventScroll:true});
+    }
+    restorePosition();
+    if(fullscreenOwned&&document.fullscreenElement===playPanel){
+      document.exitFullscreen().then(()=>{if(!playSession)restorePosition();}).catch(()=>{});
+    }
+    fullscreenOwned=false;
+  }
+  async function requestPlayFullscreen(){
+    if(!playSession||!playPanel.requestFullscreen)return;
+    fullscreenOwned=true;
+    try{await playPanel.requestFullscreen();if(!playSession&&document.fullscreenElement===playPanel)await document.exitFullscreen();}
+    catch{fullscreenOwned=false;} // Viewport layout remains usable when denied or unsupported.
+    sizePlayScreen();clearInput();
+  }
   const PALETTE = {text:'#f7e9b5',hp:'#e68d72',xp:'#93d8bf'};
 
   function pseudo(seed) {
@@ -245,6 +347,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   function requiredXp(){return 30+(state.level-1)*15;}
   function updateUi(){
     const p=state.player,need=requiredXp(),completed=state.questDone;
+    $('play-stats').textContent=`Lv.${state.level} · HP ${Math.ceil(p.hp)}/100 · EXP ${state.xp}/${need} · 토벌 ${Math.min(3,state.kills)}/3`;
     $('level-text').textContent='LEVEL '+String(state.level).padStart(2,'0');
     $('hp-text').textContent=`${Math.ceil(p.hp)} / 100`;
     $('hp-bar').style.width=clamp(p.hp,0,100)+'%';
@@ -279,7 +382,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     if(state.player.cool<=0){queuedAttack=null;attack(direction);}
     else queuedAttack={direction,remaining:MELEE.buffer}; // One slot, never a combo queue.
   }
-  function clearInput(){keys.clear();attackKeys.clear();queuedAttack=null;}
+  function clearInput(){keys.clear();attackKeys.clear();queuedAttack=null;releaseJoystick();releaseAttackPointer();}
   function attack(direction=inputDirection()){
     if(!started||paused||!state||state.player.hp<=0)return;
     const p=state.player;if(p.cool>0)return;
@@ -464,18 +567,52 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
           if(state.player.cool<=0){queuedAttack=null;attack();}
         }
       }
-      if(e.code==='Escape'){togglePause();e.preventDefault();}
+      if(e.code==='Escape'){if(playSession)exitPlayMode();else togglePause();e.preventDefault();}
     });
     window.addEventListener('keyup',e=>{recordKey(e);if(keyboard[e.key])keys.delete(keyboard[e.key]);attackKeys.delete(e.code);});
     window.addEventListener('blur',clearInput);
     document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput();if(started&&!paused&&state.player.hp>0)togglePause();}});
-    document.querySelectorAll('[data-dir]').forEach(btn=>{
-      const direction=btn.dataset.dir;
-      const up=()=>{keys.delete(direction);btn.classList.remove('pressed');};
-      btn.addEventListener('pointerdown',e=>{e.preventDefault();keys.add(direction);btn.classList.add('pressed');btn.setPointerCapture(e.pointerId);});
-      ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>btn.addEventListener(ev,up));
+    const joystick=$('joystick');
+    function moveJoystick(e){
+      if(e.pointerId!==touch.pointerId)return;
+      e.preventDefault();
+      const box=joystick.getBoundingClientRect(),radius=box.width/2;
+      const dx=e.clientX-(box.left+radius),dy=e.clientY-(box.top+box.height/2);
+      const length=Math.hypot(dx,dy),travel=radius-26;
+      const scale=length?Math.min(length,travel)/length:0;
+      $('joystick-knob').style.transform=`translate(${dx*scale}px,${dy*scale}px)`;
+      touch.x=length>radius*JOYSTICK_DEADZONE?dx/length:0;
+      touch.y=length>radius*JOYSTICK_DEADZONE?dy/length:0;
+    }
+    joystick.addEventListener('pointerdown',e=>{
+      e.preventDefault();
+      if(touch.pointerId!==null||e.button!==0||!started||paused||state.player.hp<=0)return;
+      touch.pointerId=e.pointerId;joystick.setPointerCapture(e.pointerId);
+      joystick.classList.add('active');moveJoystick(e);
     });
-    $('attack-btn').addEventListener('pointerdown',e=>{e.preventDefault();if(e.button===0)requestAttack();});
+    joystick.addEventListener('pointermove',moveJoystick);
+    ['pointerup','pointercancel','lostpointercapture'].forEach(type=>joystick.addEventListener(type,e=>{
+      if(e.pointerId===touch.pointerId)releaseJoystick();
+    }));
+    const attackButton=$('attack-btn');
+    attackButton.addEventListener('pointerdown',e=>{
+      e.preventDefault();
+      if(touch.attackId!==null||e.button!==0||!started||paused||state.player.hp<=0)return;
+      touch.attackId=e.pointerId;attackButton.setPointerCapture(e.pointerId);
+      requestAttack(); // Keep the existing one-shot pointer rule, including its tap buffer.
+    });
+    ['pointerup','pointercancel','lostpointercapture'].forEach(type=>attackButton.addEventListener(type,e=>{
+      if(e.pointerId===touch.attackId){if(type!=='pointerup')queuedAttack=null;releaseAttackPointer();}
+    }));
+    window.addEventListener('resize',()=>{clearInput();sizePlayScreen();});
+    window.visualViewport?.addEventListener('resize',()=>{clearInput();sizePlayScreen();});
+    window.visualViewport?.addEventListener('scroll',sizePlayScreen);
+    document.addEventListener('fullscreenchange',()=>{if(fullscreenOwned&&document.fullscreenElement!==playPanel)exitPlayMode();sizePlayScreen();});
+    $('play-mode-btn').addEventListener('click',enterPlayMode);
+    $('exit-play-btn').addEventListener('click',exitPlayMode);
+    $('exit-play-btn').addEventListener('pointerup',e=>{if(e.pointerType==='touch'){e.preventDefault();exitPlayMode();}});
+    $('fullscreen-btn').addEventListener('click',requestPlayFullscreen);
+    if(screen.orientation?.addEventListener)screen.orientation.addEventListener('change',clearInput);
     $('reset-btn').addEventListener('click',reset);
     $('pause-btn').addEventListener('click',togglePause);
   }
