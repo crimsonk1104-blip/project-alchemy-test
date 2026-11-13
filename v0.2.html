@@ -113,7 +113,22 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
   const keys = new Set();
   const random = (a,b) => a + Math.random()*(b-a);
   const clamp = (x,min,max) => Math.max(min,Math.min(max,x));
-  const dirs = {up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+  // Combat geometry is independent of the four-direction Ninja Adventure sprites.
+  const MELEE = Object.freeze({range:104, minDot:.10, duration:.24, cooldown:.39});
+  function inputDirection(){
+    const x=Number(keys.has('right'))-Number(keys.has('left'));
+    const y=Number(keys.has('down'))-Number(keys.has('up'));
+    const length=Math.hypot(x,y);
+    return length ? {x:x/length,y:y/length} : null;
+  }
+  function spriteFacing(direction){
+    return Math.abs(direction.x)>Math.abs(direction.y)
+      ? (direction.x>0?'right':'left') : (direction.y>0?'down':'up');
+  }
+  function inStrike(strike,target){
+    const dx=target.x-strike.x,dy=target.y-strike.y,d=Math.hypot(dx,dy);
+    return d>0&&d<MELEE.range&&(dx*strike.direction.x+dy*strike.direction.y)/d>MELEE.minDot;
+  }
   const obstacles = [
     ['treeOak', 76,126],['treePine', 149,97],['treeRound',250,88],
     ['treeRound', 838,94],['treePine',910,154],['treeOak',953,270],
@@ -214,7 +229,7 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
   function reset(){
     keys.clear();
     tick=0;paused=false;$('pause-btn').textContent='Ⅱ 일시정지';
-    state={player:{x:478,y:342,hp:100,invuln:0,attack:0,cool:0,face:'right',walking:false,walkClock:0},enemies:[],effects:[],numbers:[],particles:[],kills:0,xp:0,level:1,questDone:false,spawnTimer:2.5,deathNotified:false};
+    state={player:{x:478,y:342,hp:100,invuln:0,attack:0,cool:0,face:'right',aim:{x:1,y:0},strike:null,walking:false,walkClock:0},enemies:[],effects:[],numbers:[],particles:[],kills:0,xp:0,level:1,questDone:false,spawnTimer:2.5,deathNotified:false};
     state.enemies=[newEnemy(627,342),newEnemy(353,416)];
     messages.length=0;addLog('연금의 숲에 입장했습니다.','highlight');updateUi();
   }
@@ -232,14 +247,16 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
   function attack(){
     if(!started||paused||!state||state.player.hp<=0)return;
     const p=state.player;if(p.cool>0)return;
-    p.attack=.24;p.cool=.39;
-    const forward=dirs[p.face];let hits=0;
+    // Sample held input here too: attacking can precede the next movement frame.
+    p.aim=inputDirection()||p.aim;
+    p.face=spriteFacing(p.aim);
+    p.attack=MELEE.duration;p.cool=MELEE.cooldown;
+    const strike=p.strike={x:p.x,y:p.y,direction:{...p.aim}};
+    const forward=strike.direction;let hits=0;
     for(const e of state.enemies){
-      const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;
-      const directional=(dx*forward[0]+dy*forward[1])/d;
-      if(d<104&&directional>.10){
+      if(e.hp>0&&inStrike(strike,e)){
         e.hp--;e.hit=.19;e.knock=.10;
-        e.x=clamp(e.x+forward[0]*16,24,W-24);e.y=clamp(e.y+forward[1]*16,115,H-24);
+        e.x=clamp(e.x+forward.x*16,24,W-24);e.y=clamp(e.y+forward.y*16,115,H-24);
         hits++;popup(e.x,e.y-28,'-1','#fff1ba');burst(e.x,e.y-15,10,'#e8e3a5');
       }
     }
@@ -248,12 +265,10 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
   }
   function movement(dt){
     const p=state.player;
-    let x=(keys.has('right')?1:0)-(keys.has('left')?1:0);
-    let y=(keys.has('down')?1:0)-(keys.has('up')?1:0);
-    const mag=Math.hypot(x,y);p.walking=mag>0;
-    if(mag){x/=mag;y/=mag;
-      if(Math.abs(x)>Math.abs(y))p.face=x>0?'right':'left';
-      else p.face=y>0?'down':'up';
+    const direction=inputDirection();p.walking=!!direction;
+    if(direction){
+      const {x,y}=direction;
+      p.aim=direction;p.face=spriteFacing(direction);
       if(canStand(p.x+x*178*dt,p.y,17))p.x+=x*178*dt;
       if(canStand(p.x,p.y+y*178*dt,17))p.y+=y*178*dt;
       p.walkClock+=dt;
@@ -310,7 +325,7 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
     ctx.save();ctx.globalAlpha=.32;ctx.fillStyle='#112923';ctx.beginPath();ctx.ellipse(Math.round(x),Math.round(y),rx,ry,0,0,2*Math.PI);ctx.fill();ctx.restore();
   }
   function drawPlayer(){
-    const p=state.player,s=CFG.sprites.knight,idx=s.directionColumns[p.face];
+    const p=state.player,s=CFG.sprites.knight,idx=s.directionColumns[p.attack>0?spriteFacing(p.strike.direction):p.face];
     drawShadow(p.x,p.y,20,8);
     const walking=p.walking&&p.attack<=0;
     const mode=p.attack>0?'knightAttack':walking?'knightWalk':'knightIdle';
@@ -319,11 +334,16 @@ Object.assign(window.ALCHEMY_ASSETS.files,{"knightIdle": "data:image/png;base64,
     if(p.invuln>0&&Math.floor(p.invuln*14)%2===0)ctx.globalAlpha=.55;
     sprite(images[mode],idx*sw,row*sh,sw,sh,p.x-dw/2,p.y-dh+5,dw,dh);ctx.globalAlpha=1;
     if(p.attack>0){
-      const v=dirs[p.face];
-      ctx.save();ctx.translate(Math.round(p.x+v[0]*37),Math.round(p.y-21+v[1]*36));
-      ctx.rotate(p.face==='up'?-Math.PI/2:p.face==='down'?Math.PI/2:p.face==='left'?Math.PI:0);
+      // Lock the visual to the same origin and direction used for this hit.
+      const strike=p.strike,angle=Math.atan2(strike.direction.y,strike.direction.x);
+      ctx.save();ctx.translate(strike.x,strike.y);ctx.rotate(angle);
+      const halfAngle=Math.acos(MELEE.minDot);
+      ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,MELEE.range,-halfAngle,halfAngle);ctx.closePath();
+      ctx.fillStyle='rgba(255,235,164,.10)';ctx.fill();
+      ctx.strokeStyle='rgba(255,235,164,.35)';ctx.lineWidth=1;ctx.stroke();
+      ctx.translate(37,0);
       const fxCfg=CFG.sprites.slash;
-      const frame=clamp(Math.floor((.24-p.attack)*fxCfg.fps),0,fxCfg.frames-1);
+      const frame=clamp(Math.floor((MELEE.duration-p.attack)*fxCfg.fps),0,fxCfg.frames-1);
       const [fw,fh]=fxCfg.size;
       sprite(images.slash,frame*fw,0,fw,fh,-fw*fxCfg.scale/2,-fh*fxCfg.scale/2,fw*fxCfg.scale,fh*fxCfg.scale);
       ctx.restore();
