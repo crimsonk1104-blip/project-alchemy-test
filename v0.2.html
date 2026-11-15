@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#101b22">
   <meta name="description" content="PROJECT ALCHEMY의 독립형 픽셀 RPG 그래픽 프로토타입 v0.2. 가상 데이터로만 실행됩니다.">
-  <title>PROJECT ALCHEMY · 연금술사의 숲 · v0.2</title>
+  <title>PROJECT ALCHEMY · 연금술사의 숲 · v0.4</title>
   <style>
 :root{--bg:#0c171d;--bg2:#15252c;--panel:#17272f;--panel-2:#1e3137;--line:#355057;--text:#eff4e5;--muted:#a9bfb9;--gold:#e7c584;--mint:#8cdaa9;--red:#e78980;--blue:#93bbdf}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);font-family:system-ui,-apple-system,"Pretendard","Malgun Gothic",sans-serif;background:radial-gradient(ellipse at 18% -10%,#254138 0%,transparent 37%),radial-gradient(ellipse at 88% 20%,#193642 0%,transparent 33%),var(--bg);min-height:100vh}button{font:inherit;cursor:pointer}button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}.app{max-width:1500px;padding:26px clamp(12px,3vw,40px) 22px;margin:auto}.masthead{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-bottom:24px;border-bottom:1px solid #344b4b}.brand-wrap{display:flex;gap:17px;align-items:center}.brand-symbol{width:52px;height:52px;border:1px solid #547267;background:#253d3b;display:grid;place-items:center;border-radius:16px;font-size:29px;color:var(--gold);box-shadow:0 0 0 4px #172b2b}.eyebrow{font-size:10px;letter-spacing:.14em;color:#9ce2c3;font-weight:800}.masthead h1{font-family:Georgia,"Malgun Gothic",serif;font-size:clamp(23px,2.6vw,31px);line-height:1.2;letter-spacing:-.04em;margin:6px 0 0;font-weight:800}.h1-sub{font-size:.58em;color:#9bbab1;font-family:system-ui;font-weight:500;letter-spacing:-.03em}.masthead-tags{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.chip{border:1px solid #415c58;border-radius:30px;padding:10px 13px;color:#c4d8cd;font-size:11px;white-space:nowrap;letter-spacing:.04em}.chip-online{background:#213e39;color:#b8e2c1;border-color:#4d7864}.live-dot{width:7px;height:7px;background:#91dca3;display:inline-block;border-radius:50%;box-shadow:0 0 9px #7bdca2;margin-right:7px}.hero-copy{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:24px 0 20px}.hero-overline{font-size:11px;font-weight:800;letter-spacing:.19em;color:var(--gold)}.hero-overline span{color:#517a69;margin:0 5px}.hero-copy p{margin:0;font-size:12px;color:#b0c5c0}.main-grid{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:19px;align-items:start}.game-panel{border:1px solid #527466;border-radius:16px;overflow:hidden;background:#102326;box-shadow:0 20px 70px #0007,0 0 0 5px #172b2d}.panel-topline{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 17px;background:#213630;color:#f2d89e;font-weight:800;letter-spacing:.09em;font-size:11px;border-bottom:2px solid #527363}.golden-star{font-size:16px;margin-right:9px}.topline-right{display:flex;gap:19px;align-items:center;font-weight:600;color:#bdd2c9;letter-spacing:.03em}.map-coord{font-size:10px;color:#7fb4a0}.test-light{font-size:11px}.test-light span{display:inline-block;background:#81d9a2;width:6px;height:6px;border-radius:50%;margin-right:4px}.stage-wrap{position:relative;overflow:hidden;background:#365a3e}.stage-wrap canvas{display:block;width:100%;height:auto;aspect-ratio:5/3;image-rendering:pixelated;touch-action:none}.stage-hud{position:absolute;top:17px;z-index:2;color:#f9f4d9;background:linear-gradient(90deg,#102a2de8,#112b2bce);border:1px solid #7390717a;padding:10px 14px;border-radius:3px;box-shadow:0 6px 12px #0c201b64;pointer-events:none}.stage-hud-left{left:17px}.stage-hud-right{right:17px;text-align:right;background:linear-gradient(270deg,#102a2de8,#112b2bce)}.hud-label{font-size:9px;letter-spacing:.18em;color:#a4c1ad;font-weight:800}.stage-hud strong{display:block;font-size:16px;margin:3px 0 2px}.stage-hud small,.stage-hud span{font-size:11px;color:#c5dec6}.stage-hud-right b{color:#f3d187}.stage-bottom-label{position:absolute;left:14px;bottom:13px;padding:8px 12px;background:#152c2ddf;color:#e8d9b0;font-weight:700;letter-spacing:.01em;font-size:12px;border-left:3px solid #e2c786;border-radius:2px;pointer-events:none}.stage-loading{display:flex;justify-content:center;align-items:center;position:absolute;inset:0;background:#14262be8;color:#e3d3a9;font-weight:800;z-index:4}.stage-loading.hidden{display:none}.game-toolbar{background:#192e32;padding:13px 17px;display:flex;align-items:center;justify-content:space-between;gap:14px;border-top:2px solid #527363}.keyhint{color:#bed2c9;font-size:12px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}.keycap{min-width:24px;display:inline-grid;place-items:center;padding:4px 6px;border:1px solid #789184;border-bottom:3px solid #789184;background:#314c49;color:#f5f3df;border-radius:4px;font-size:10px;font-weight:900}.keycap:nth-of-type(4){margin-right:7px}.widekey{min-width:58px;margin-left:8px}.toolbar-actions{display:flex;gap:8px;align-items:center}.tool-btn{border:1px solid #55746c;border-radius:8px;background:#25413e;color:#d5e9dd;padding:9px 12px;font-size:11px;font-weight:700;white-space:nowrap}.tool-btn:hover{background:#355d54}.tool-btn-bright{border-color:#8a7752;color:#efd4a2;background:#443f30}.tool-btn-bright:hover{background:#5c5038}.sidebar{display:flex;flex-direction:column;gap:15px}.info-card{background:linear-gradient(150deg,#21373a,#16282f);border:1px solid #486660;border-radius:12px;padding:17px;box-shadow:0 10px 25px #06111650}.section-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}.section-kicker{font-size:10px;color:#a4cabb;font-weight:800;letter-spacing:.12em}.rarity-tag,.quest-badge{border:1px solid #917e58;background:#3a3b2c;color:#e7c78b;font-size:9px;padding:4px 7px;border-radius:3px;font-weight:800}.character-summary{display:flex;gap:13px;align-items:center}.portrait-frame{width:70px;height:70px;flex:0 0 auto;border-radius:8px;border:2px solid #7d936e;background:linear-gradient(150deg,#406457,#243b39);display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 0 0 5px #243e37}.portrait-frame img{width:64px;height:64px;object-fit:cover;image-rendering:pixelated}.character-title{font-weight:900;font-size:18px;letter-spacing:-.05em}.level-chip{color:#f8d388;font-size:12px;font-weight:900;margin:5px 0}.caption{color:#a6c0b7;font-size:10px;line-height:1.5}.stat-header{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin:21px 0 8px;color:#eeeada;font-weight:700}.stat-header strong{font-size:12px;font-weight:800}.stat-header small{font-size:10px;color:#95b2a8;margin-left:4px}.xp-head{margin-top:16px}.meter{height:11px;background:#0f2029;border:1px solid #37544f;border-radius:30px;overflow:hidden}.meter-fill{height:100%;width:100%;transition:width .18s ease}.hp-fill{background:linear-gradient(90deg,#b95653,#f5a17f)}.xp-fill{background:linear-gradient(90deg,#518e9d,#86d9c3)}.demo-caption{margin-top:16px;border-top:1px solid #3d5551;padding-top:11px;font-size:10px;color:#94b1aa}.quest-entry{display:flex;gap:10px;align-items:flex-start}.quest-gem{color:#f1c879;background:#3d3c2c;width:30px;height:30px;border:1px solid #705d3e;border-radius:6px;display:grid;place-items:center;flex:none}.quest-entry h2,.record-card h2{font-size:15px;margin:0;font-weight:900}.quest-entry p{font-size:11px;line-height:1.6;color:#b2c9c2;margin:7px 0 0}.quest-progress-row{display:flex;justify-content:space-between;margin:20px 0 8px;color:#b5ccc2;font-size:11px}.quest-progress-row span:last-child{color:#e3d0a2;font-weight:900}.quest-progress{height:7px;border-radius:10px;background:#12252a;overflow:hidden}.quest-progress div{height:100%;width:0;background:linear-gradient(90deg,#6aaf78,#c2db7b);transition:width .2s}.reward-line{font-size:11px;color:#a0b7a9;margin-top:16px;display:flex;justify-content:space-between}.reward-line strong{color:#e9cb86}.quest-status{border-top:1px solid #3e5751;color:#bed0a1;font-size:11px;font-weight:800;margin-top:15px;padding-top:12px}.record-card h2{margin-bottom:12px}.record-symbol{font-size:19px;color:#b2c9ba}.log-items{display:flex;flex-direction:column;gap:10px;min-height:86px}.log-line{border-left:2px solid #567c65;padding:3px 0 3px 10px;font-size:11px;line-height:1.7;color:#c7d6ca}.log-line.highlight{border-color:#e3bf78;color:#f1d4a0}.log-line.hurt{border-color:#d87574;color:#ecc4b8}.small-notice{display:flex;gap:11px;padding:15px 14px;border:1px solid #4f6963;background:#172b2b;border-radius:11px;color:#abc8b9}.notice-icon{color:#bde4bd;font-size:18px}.small-notice strong{color:#cfdfc9;font-size:12px}.small-notice p{font-size:11px;line-height:1.7;margin:5px 0 0}.footer{margin-top:24px;padding-top:15px;border-top:1px solid #3a4e4c;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;color:#82a19a;font-size:10px;letter-spacing:.1em}.mobile-controls{display:flex;gap:36px;align-items:center;justify-content:space-between;padding:16px 28px 22px;background:#14272a;touch-action:none;user-select:none;-webkit-user-select:none}.action-stack{display:flex;flex-direction:column;align-items:center;gap:6px}.action-stack>span{font-size:9px;color:#8aab9b;letter-spacing:.18em;font-weight:800}.attack-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:99px;height:88px;border:2px solid #b98e61;border-radius:13px;color:#fff0cc;background:radial-gradient(circle at 35% 20%,#9b6953,#62433c);font-size:27px;font-weight:900;touch-action:none;user-select:none;box-shadow:0 5px 0 #412d2b}.attack-btn small{font-size:10px;letter-spacing:.13em}.attack-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #412d2b}
@@ -55,6 +55,12 @@ html.play-active{overflow:hidden;overscroll-behavior-y:none;scroll-behavior:auto
 .play-screen .joystick{width:100px;height:100px;grid-column:1;grid-row:2;align-self:end;justify-self:center;margin-bottom:12px}
 .play-screen .action-stack{grid-column:3;grid-row:2;align-self:end;justify-self:center;margin-bottom:12px}
 }
+#inventory-dialog{color:var(--text);background:#17272f;border:1px solid var(--mint);border-radius:16px;width:min(440px,calc(100% - 24px));max-height:80dvh;padding:20px;overflow:auto;overscroll-behavior:contain}
+#inventory-dialog::backdrop{background:#061217bb}
+.inventory-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#inventory-close{min-height:44px;min-width:64px}
+.inventory-entry{padding:12px 0;border-bottom:1px solid var(--line);line-height:1.6}
+.inventory-entry p,.inventory-notice{font-size:12px;color:var(--muted);line-height:1.6}
 </style>
 </head>
 <body>
@@ -64,7 +70,7 @@ html.play-active{overflow:hidden;overscroll-behavior-y:none;scroll-behavior:auto
         <div class="brand-symbol" aria-hidden="true">⚗</div>
         <div><div class="eyebrow">P R O J E C T &nbsp; A L C H E M Y</div><h1>연금술사의 숲 <span class="h1-sub">/ 첫 번째 원정</span></h1></div>
       </div>
-      <div class="masthead-tags"><span class="chip chip-online"><span class="live-dot"></span> LOCAL PROTOTYPE</span><span class="chip">PIXEL RPG · v0.2</span></div>
+      <div class="masthead-tags"><span class="chip chip-online"><span class="live-dot"></span> LOCAL PROTOTYPE</span><span class="chip">PIXEL RPG · v0.4</span></div>
     </header>
     <div class="hero-copy"><span class="hero-overline">CHAPTER 01 <span>◆</span> ALCHEMY CONTINENT</span><p>숲 속 훈련장에서 첫 모험을 시작하세요. 이 시범 플레이는 실제 성적과 연결되지 않습니다.</p></div>
     <div class="main-grid">
@@ -79,16 +85,22 @@ html.play-active{overflow:hidden;overscroll-behavior-y:none;scroll-behavior:auto
         </div>
         <div class="game-toolbar">
           <div class="keyhint"><span class="keycap">W</span><span class="keycap">A</span><span class="keycap">S</span><span class="keycap">D</span> 이동 <span class="keycap widekey">SPACE / J</span> 누르고 있으면 연속 공격</div>
-          <output id="play-stats" aria-label="전투 상태"></output><div class="toolbar-actions"><button type="button" class="tool-btn tool-btn-bright" id="play-mode-btn">게임 시작 · 전용 화면</button><button type="button" class="tool-btn" id="fullscreen-btn" hidden>전체 화면</button><button type="button" class="tool-btn" id="exit-play-btn">플레이 종료</button><button type="button" id="pause-btn" class="tool-btn">Ⅱ 일시정지</button><button type="button" id="reset-btn" class="tool-btn tool-btn-bright">↻ 다시 시작</button></div>
+          <output id="play-stats" aria-label="전투 상태"></output><div class="toolbar-actions"><button type="button" class="tool-btn tool-btn-bright" id="play-mode-btn">게임 시작 · 전용 화면</button><button type="button" class="tool-btn" id="fullscreen-btn" hidden>전체 화면</button><button type="button" class="tool-btn" id="exit-play-btn">플레이 종료</button><button type="button" id="inventory-btn" class="tool-btn">가방</button><button type="button" id="pause-btn" class="tool-btn">Ⅱ 일시정지</button><button type="button" id="reset-btn" class="tool-btn tool-btn-bright">↻ 다시 시작</button></div>
         </div>
         <div class="mobile-controls" aria-label="터치 조작 버튼">
           <div id="joystick" class="joystick" role="group" aria-label="가상 조이스틱: 드래그하여 이동"><div id="joystick-knob" class="joystick-knob"></div></div>
           <div class="action-stack"><span>터치 1회 공격</span><button id="attack-btn" class="attack-btn" type="button">⚔<small>ATTACK</small></button></div>
         </div>
+        <dialog id="inventory-dialog" aria-labelledby="inventory-title" aria-describedby="inventory-note">
+          <div class="inventory-head"><h2 id="inventory-title">인벤토리 · v0.4</h2><button type="button" id="inventory-close" class="tool-btn">닫기</button></div>
+          <p>가방을 확인하는 동안 전투는 일시정지됩니다.</p>
+          <div id="inventory-content"></div>
+          <p id="inventory-note" class="inventory-notice">테스트 전용: 보상 수량·아이템 이름은 임시값이며 확정된 게임 경제 규칙이 아닙니다. 새로고침·재시작 시 초기화됩니다.</p>
+        </dialog>
       </section>
       <aside class="sidebar" aria-label="캐릭터 및 퀘스트 정보">
         <section class="info-card character-card"><div class="section-header"><span class="section-kicker">01 / CHARACTER</span><span class="rarity-tag">APPRENTICE</span></div><div class="character-summary"><div class="portrait-frame"><img src="data:image/png;base64,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" alt="연금검사 캐릭터 초상" draggable="false"></div><div><div class="character-title">견습 연금검사</div><div class="level-chip" id="level-text">LEVEL 01</div><div class="caption">검의 길을 걷는 초보 모험가</div></div></div><div class="stat-header"><span>♥ 체력 <small>HP</small></span><strong id="hp-text">100 / 100</strong></div><div class="meter"><div id="hp-bar" class="meter-fill hp-fill"></div></div><div class="stat-header xp-head"><span>✦ 성장 경험치 <small>EXP</small></span><strong id="xp-text">0 / 30</strong></div><div class="meter"><div id="xp-bar" class="meter-fill xp-fill"></div></div><div class="demo-caption">시범 캐릭터 · 학습 성적과 무관</div></section>
-        <section class="info-card quest-card"><div class="section-header"><span class="section-kicker">02 / FIELD QUEST</span><span class="quest-badge">MAIN QUEST</span></div><div class="quest-entry"><span class="quest-gem">◆</span><div><h2>숲의 첫 번째 수련</h2><p>훈련용 슬라임 3마리를 처치하자.</p></div></div><div class="quest-progress-row"><span>진행도</span><span id="quest-progress">0 / 3</span></div><div class="quest-progress"><div id="quest-bar"></div></div><div class="reward-line">보상 <strong>추가 경험치 +15</strong></div><div class="quest-status" id="quest-status">● 퀘스트 진행 중</div></section>
+        <section class="info-card quest-card"><div class="section-header"><span class="section-kicker">02 / FIELD QUEST</span><span class="quest-badge">MAIN QUEST</span></div><div class="quest-entry"><span class="quest-gem">◆</span><div><h2>숲의 첫 번째 수련</h2><p>훈련용 슬라임 3마리를 처치하자.</p></div></div><div class="quest-progress-row"><span>진행도</span><span id="quest-progress">0 / 3</span></div><div class="quest-progress"><div id="quest-bar"></div></div><div class="reward-line">보상 <strong>EXP +15 · 연금화폐 +20 · 점액 +2 (임시)</strong></div><div class="quest-status" id="quest-status">● 퀘스트 진행 중</div></section>
         <section class="info-card record-card"><div class="section-header"><span class="section-kicker">03 / ADVENTURE LOG</span><span class="record-symbol">≡</span></div><h2>전투 기록</h2><div class="log-items" id="log-items" aria-live="polite"><div class="log-line">연금의 숲에 입장했습니다.</div></div></section>
         <section class="small-notice"><span class="notice-icon">ⓘ</span><div><strong>독립형 기술 검증</strong><p>가상 데이터만 사용하며 로그인·학생정보 수집·외부 전송·실제 성적 반영은 없습니다. 다시 시작하거나 새로고침하면 진행 상황이 초기화됩니다.</p></div></section>
       </aside>
@@ -255,6 +267,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     $('exit-play-btn').focus({preventScroll:true});
   }
   function exitPlayMode(){
+    closeInventory();
     if(!playSession)return;
     const saved=playSession;playSession=null;clearInput();paused=true;
     $('pause-btn').textContent='▶ 계속하기';
@@ -281,6 +294,56 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     try{await playPanel.requestFullscreen();if(!playSession&&document.fullscreenElement===playPanel)await document.exitFullscreen();}
     catch{fullscreenOwned=false;} // Viewport layout remains usable when denied or unsupported.
     sizePlayScreen();clearInput();
+  }
+  // Catalogs, mutable holdings, and reward policies are separate; no persistence.
+  const CURRENCIES=Object.freeze({alchemyCoin:Object.freeze({name:'연금화폐',description:'훈련 보상으로 받는 테스트용 화폐입니다.'})});
+  const ITEMS=Object.freeze({slimeMucus:Object.freeze({name:'슬라임 점액',description:'슬라임에게서 얻는 제작 재료입니다. 제작 기능은 아직 없습니다.'})});
+  const MONSTER_REWARDS=Object.freeze({slime:Object.freeze({xp:10,currencies:Object.freeze({alchemyCoin:5}),items:Object.freeze({slimeMucus:1})})});
+  const QUEST_REWARDS=Object.freeze({slimeTraining:Object.freeze({xp:15,currencies:Object.freeze({alchemyCoin:20}),items:Object.freeze({slimeMucus:2})})});
+  let enemySequence=0,inventorySession=null;
+  function renderInventory(){
+    const container=$('inventory-content');container.replaceChildren();
+    for(const [catalog,holdings] of [[CURRENCIES,state.inventory.currencies],[ITEMS,state.inventory.items]]){
+      for(const [id,definition] of Object.entries(catalog)){
+        const entry=document.createElement('div');entry.className='inventory-entry';
+        const title=document.createElement('strong');title.textContent=`${definition.name} · ${holdings[id]||0}개`;
+        const description=document.createElement('p');description.textContent=definition.description;
+        entry.append(title,description);container.append(entry);
+      }
+    }
+  }
+  function openInventory(){
+    if(!started||inventorySession)return;
+    inventorySession={paused,focus:document.activeElement};clearInput();paused=true;
+    renderInventory();$('inventory-dialog').showModal();$('inventory-close').focus({preventScroll:true});
+  }
+  function closeInventory(){
+    if(!inventorySession)return;
+    const saved=inventorySession;inventorySession=null;clearInput();
+    $('inventory-dialog').close();paused=saved.paused;
+    saved.focus?.focus({preventScroll:true});
+  }
+  function grantReward(eventId,reward){
+    if(state.rewardedEvents.has(eventId))return false;
+    state.rewardedEvents.add(eventId);
+    for(const group of ['currencies','items']){
+      for(const [id,quantity] of Object.entries(reward[group]))state.inventory[group][id]=(state.inventory[group][id]||0)+quantity;
+    }
+    awardXp(reward.xp);return true;
+  }
+  function rewardSummary(reward){
+    return [`EXP +${reward.xp}`,...Object.entries(reward.currencies).map(([id,n])=>`${CURRENCIES[id].name} +${n}`),...Object.entries(reward.items).map(([id,n])=>`${ITEMS[id].name} +${n}`)].join(' · ');
+  }
+  function rewardDefeat(enemy){
+    if(enemy.hp>0||!state.enemies.includes(enemy))return false;
+    const reward=MONSTER_REWARDS[enemy.type];
+    if(!reward||!grantReward('monster:'+enemy.id,reward))return false;
+    state.kills++;popup(enemy.x,enemy.y-25,`+${reward.xp} EXP`,PALETTE.xp);
+    addLog('몬스터 처치! '+rewardSummary(reward),'highlight');
+    if(state.kills>=3&&grantReward('quest:slimeTraining',QUEST_REWARDS.slimeTraining)){
+      state.questDone=true;addLog('퀘스트 완료! '+rewardSummary(QUEST_REWARDS.slimeTraining),'highlight');
+    }
+    updateUi();return true;
   }
   const PALETTE = {text:'#f7e9b5',hp:'#e68d72',xp:'#93d8bf'};
 
@@ -320,7 +383,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     }
     const v=g.createLinearGradient(0,0,0,H);v.addColorStop(0,'rgba(9,27,28,.12)');v.addColorStop(.5,'rgba(9,27,28,0)');v.addColorStop(1,'rgba(4,24,25,.28)');g.fillStyle=v;g.fillRect(0,0,W,H);
   }
-  function newEnemy(x,y){return {x,y,hp:3,maxHp:3,r:19,hit:0,phase:random(0,6),facing:'down',flash:0,knock:0};}
+  function newEnemy(x,y){return {id:++enemySequence,type:'slime',x,y,hp:3,maxHp:3,r:19,hit:0,phase:random(0,6),facing:'down',flash:0,knock:0};}
   function canStand(x,y,r=17){
     if(x<22||x>W-22||y<112||y>H-22)return false;
     return !obstacles.some(o=>o.radius>0&&Math.hypot(x-o.x,y-o.y)<r+o.radius*.8);
@@ -359,9 +422,10 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     $('quest-status').textContent=completed?'★ 퀘스트 완료 · 보상 획득':'● 퀘스트 진행 중';
   }
   function reset(){
+    closeInventory();
     clearInput();diagnostic.attacks=0;diagnostic.result='없음';
     tick=0;paused=false;$('pause-btn').textContent='Ⅱ 일시정지';
-    state={player:{x:478,y:342,hp:100,invuln:0,attack:0,cool:0,face:'right',aim:{x:1,y:0},strike:null,walking:false,walkClock:0},enemies:[],effects:[],numbers:[],particles:[],kills:0,xp:0,level:1,questDone:false,spawnTimer:2.5,deathNotified:false};
+    state={player:{x:478,y:342,hp:100,invuln:0,attack:0,cool:0,face:'right',aim:{x:1,y:0},strike:null,walking:false,walkClock:0},enemies:[],effects:[],numbers:[],particles:[],kills:0,xp:0,level:1,questDone:false,inventory:{currencies:{},items:{}},rewardedEvents:new Set(),spawnTimer:2.5,deathNotified:false};
     state.enemies=[newEnemy(627,342),newEnemy(353,416)];
     messages.length=0;addLog('연금의 숲에 입장했습니다.','highlight');updateUi();
   }
@@ -455,15 +519,8 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     }
     for(let i=state.enemies.length-1;i>=0;i--){
       const e=state.enemies[i];if(e.hp>0)continue;
-      state.enemies.splice(i,1);state.kills++;
-      popup(e.x,e.y-25,'+10 EXP',PALETTE.xp);
-      awardXp(10);
-      addLog('슬라임 처치! 경험치 +10','highlight');
-      if(state.kills>=3&&!state.questDone){
-        state.questDone=true;awardXp(15);
-        addLog('퀘스트 완료! 추가 경험치 +15','highlight');
-      }
-      updateUi();
+      rewardDefeat(e);
+      state.enemies.splice(i,1);
     }
     if(state.enemies.length<2){state.spawnTimer-=dt;if(state.spawnTimer<=0){state.enemies.push(safeSpawn());state.spawnTimer=2.6;}}
     for(const fx of state.particles){fx.x+=fx.vx*dt;fx.y+=fx.vy*dt;fx.vy+=220*dt;fx.life-=dt;}
@@ -549,6 +606,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     update(dt);draw();renderInputDebug();window.requestAnimationFrame(frame);
   }
   function togglePause(){
+    if(inventorySession)return;
     if(!started||!state||state.player.hp<=0)return;
     paused=!paused;clearInput();
     $('pause-btn').textContent=paused?'▶ 계속하기':'Ⅱ 일시정지';
@@ -558,6 +616,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     const keyboard={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',a:'left',s:'down',d:'right',W:'up',A:'left',S:'down',D:'right'};
     window.addEventListener('keydown',e=>{
       recordKey(e);
+      if(inventorySession){if(e.code==='Escape'){closeInventory();e.preventDefault();}return;}
       if(keyboard[e.key]){keys.add(keyboard[e.key]);e.preventDefault();}
       if(e.code==='Space'||e.code==='KeyJ'){
         e.preventDefault();
@@ -613,6 +672,10 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     $('exit-play-btn').addEventListener('pointerup',e=>{if(e.pointerType==='touch'){e.preventDefault();exitPlayMode();}});
     $('fullscreen-btn').addEventListener('click',requestPlayFullscreen);
     if(screen.orientation?.addEventListener)screen.orientation.addEventListener('change',clearInput);
+    $('inventory-btn').addEventListener('click',openInventory);
+    $('inventory-close').addEventListener('click',closeInventory);
+    $('inventory-dialog').addEventListener('cancel',e=>{e.preventDefault();closeInventory();});
+    $('inventory-dialog').addEventListener('close',()=>{if(!$('inventory-dialog').open)closeInventory();});
     $('reset-btn').addEventListener('click',reset);
     $('pause-btn').addEventListener('click',togglePause);
   }
