@@ -23,9 +23,9 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  await page.locator('#inventory-btn').click();assert.match(await page.locator('#inventory-content').innerText(),/연금화폐 · 40개/);assert.match(await page.locator('#inventory-content').innerText(),/슬라임 점액 · 6개/);
  await page.screenshot({path:'/tmp/alchemy-inventory-populated.png'});await page.keyboard.press('Escape');assert.equal(await page.locator('#inventory-dialog').isVisible(),false);
  await page.locator('#pause-btn').click();await page.locator('#inventory-btn').click();await page.locator('#inventory-close').click();assert.equal(await page.evaluate(()=>rewardsTest.paused),true);
- await page.evaluate(()=>rewardsTest.reset());assert.deepEqual(await page.evaluate(()=>rewardsTest.state.inventory),{currencies:{},items:{}});
+ await page.evaluate(()=>rewardsTest.reset());assert.deepEqual(await page.evaluate(()=>rewardsTest.state.inventory),{currencies:{},items:{},equipment:{}});
  await page.evaluate(()=>{const e=rewardsTest.state.enemies[0];e.hp=0;rewardsTest.rewardDefeat(e);rewardsTest.reset();if(rewardsTest.rewardDefeat(e))throw Error('stale reset enemy rewarded');});
- await page.reload();await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));assert.deepEqual(await page.evaluate(()=>rewardsTest.state.inventory),{currencies:{},items:{}});assert.deepEqual(errors,[]);
+ await page.reload();await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));assert.deepEqual(await page.evaluate(()=>rewardsTest.state.inventory),{currencies:{},items:{},equipment:{}});assert.deepEqual(errors,[]);
  await page.locator('#play-mode-btn').click();await page.locator('#fullscreen-btn').click();await page.waitForTimeout(150);assert.equal(await page.evaluate(()=>!!document.fullscreenElement),true);
  await page.locator('#inventory-btn').click();assert.equal(await page.locator('#inventory-dialog').isVisible(),true);assert.equal(await page.evaluate(()=>document.fullscreenElement.contains(document.querySelector('#inventory-dialog'))),true);
  await page.keyboard.press('Escape');assert.equal(await page.locator('#inventory-dialog').isVisible(),false);assert.equal(await page.locator('.play-screen').count(),1);await page.locator('#exit-play-btn').click();await page.waitForTimeout(100);
