@@ -33,7 +33,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
    const d={x:c.x+32,y:c.y-24};await send('touchMove',[point(1,d)]);
    let s=await state();assert.ok(Math.abs(s.dir.x-.8)<.002&&Math.abs(s.dir.y+.6)<.002,'360 degree direction');
    const before=s.p;await step(.1);s=await state();assert.ok(Math.abs(Math.hypot(s.p.x-before.x,s.p.y-before.y)-17.8)<.01,'normalized movement');
-   await page.evaluate(()=>{const g=mobileTest,p=g.state.player,v=g.inputDirection();g.state.enemies=[g.newEnemy(p.x+v.x*70,p.y+v.y*70)];});
+   await page.evaluate(()=>{const g=mobileTest,p=g.state.player,v=g.inputDirection();g.state.enemies=[g.newEnemy(p.x+v.x*60,p.y+v.y*60)];});
    await send('touchStart',[point(1,d),point(2,a)]);
    s=await state();assert.equal(await page.evaluate(()=>scrollY),0,'joystick touch must not scroll');assert.ok(s.touch.pointerId!==null&&s.touch.attackId!==null&&s.touch.pointerId!==s.touch.attackId,'independent pointer IDs');
    assert.ok(Math.abs(s.p.strike.direction.x-.8)<.002&&Math.abs(s.p.strike.direction.y+.6)<.002,'diagonal touch attack');

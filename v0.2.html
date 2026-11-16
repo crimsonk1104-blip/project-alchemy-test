@@ -222,7 +222,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   const random = (a,b) => a + Math.random()*(b-a);
   const clamp = (x,min,max) => Math.max(min,Math.min(max,x));
   // Combat geometry is independent of the four-direction Ninja Adventure sprites.
-  const MELEE = Object.freeze({range:104, minDot:.10, duration:.24, cooldown:.39, buffer:.13});
+  const MELEE = Object.freeze({range:70, minDot:Math.SQRT1_2, duration:.24, cooldown:.39, buffer:.13});
   function inputDirection(){
     // A captured joystick owns movement until released; keyboard state is separate.
     if(touch.pointerId!==null)return touch.x||touch.y?{x:touch.x,y:touch.y}:null;
@@ -310,13 +310,13 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   }
   // Catalogs, mutable holdings, and reward policies are separate; no persistence.
   const REGIONS=Object.freeze({lobby:{name:'연구소 로비'},forest:{name:'연금의 숲'},training:{name:'연구소 뒤뜰 훈련장'}});
-  const MONSTERS=Object.freeze({slime:{hp:3,speed:42,damage:9,name:'슬라임'},automaton:{hp:12,speed:133.5,damage:4,name:'훈련용 자동인형'}});
+  const MONSTERS=Object.freeze({slime:{hp:3,speed:42,damage:9,name:'슬라임'},automaton:{hp:12,speed:124.6,damage:4,name:'훈련용 자동인형'}});
   // Enemy-only training patterns. Non-sword player weapons are not implemented.
   const AUTOMATON_PATTERNS=Object.freeze([
-    {id:'sword',name:'검',range:100,width:0,windup:.6,recovery:.35,damage:4,color:'#ffd37d',hint:'사거리 밖이나 뒤쪽으로 이동'},
-    {id:'spear',name:'창',range:210,width:28,windup:.55,recovery:.45,damage:5,color:'#79e8ed',hint:'직선 예고를 보고 옆으로 이동'},
-    {id:'bow',name:'활',range:620,width:8,windup:.5,recovery:.5,damage:4,color:'#9ee67d',hint:'조준선 옆으로 이동해 화살 회피'},
-    {id:'staff',name:'지팡이',range:620,width:66,windup:.8,recovery:.65,damage:6,color:'#d7a0ff',hint:'바닥 원 밖으로 이동'}
+    {id:'sword',name:'검',range:70,width:0,halfAngle:Math.PI/4,windup:.42,recovery:.22,damage:4,color:'#ffd37d',hint:'사거리 밖이나 뒤쪽으로 이동'},
+    {id:'spear',name:'창',range:210,width:28,windup:.42,recovery:.28,damage:5,color:'#79e8ed',hint:'직선 예고를 보고 옆으로 이동'},
+    {id:'bow',name:'활',range:620,width:8,windup:.5,recovery:.28,minDistance:170,maxDistance:270,damage:4,color:'#9ee67d',hint:'조준선 옆으로 이동해 화살 회피'},
+    {id:'staff',name:'지팡이',range:620,width:66,windup:.8,recovery:.35,minDistance:145,maxDistance:230,damage:6,color:'#d7a0ff',hint:'바닥 원 밖으로 이동'}
   ]);
   function segmentDistance(px,py,ax,ay,bx,by){
     const dx=bx-ax,dy=by-ay,length=dx*dx+dy*dy;
@@ -346,7 +346,25 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     const dx=target.x-strike.x,dy=target.y-strike.y;
     const forward=dx*strike.vx+dy*strike.vy,side=Math.abs(dx*strike.vy-dy*strike.vx);
     if(pattern.id==='spear')return forward>=-17&&forward<=pattern.range+17&&side<=pattern.width/2+17;
-    const d=Math.hypot(dx,dy);return d<=pattern.range+17&&(d===0||forward/d>=.5);
+    const d=Math.hypot(dx,dy);return d<=pattern.range&&(d===0||forward/d>=Math.cos(pattern.halfAngle));
+  }
+  function moveAutomaton(e,x,y,dt){
+    if(e.knock>0)return;
+    const distance=MONSTERS.automaton.speed*dt,oldX=e.x,oldY=e.y;
+    if(canStand(e.x+x*distance,e.y,16))e.x+=x*distance;
+    if(canStand(e.x,e.y+y*distance,16))e.y+=y*distance;
+    if(e.x===oldX&&e.y===oldY){
+      // Sidestep at arena edges instead of retreating indefinitely into a wall.
+      if(canStand(e.x-y*distance,e.y,16))e.x-=y*distance;
+      if(canStand(e.x,e.y+x*distance,16))e.y+=x*distance;
+    }
+  }
+  function spaceAutomaton(e,pattern,dt){
+    if(!pattern.minDistance)return;
+    const p=state.player,d=distance(e,p),x=d?(p.x-e.x)/d:1,y=d?(p.y-e.y)/d:0;
+    if(d<pattern.minDistance)moveAutomaton(e,-x,-y,dt);
+    else if(d>pattern.maxDistance)moveAutomaton(e,x,y,dt);
+    else moveAutomaton(e,-y*.45,x*.45,dt);
   }
   function updateAutomaton(e,dt){
     if(e.hp<=0)return;
@@ -360,14 +378,11 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
       else if(automatonStrikeHits(strike,p))hitByAutomaton(pattern.damage);
       advanceAutomaton(e);return;
     }
-    if(ai.mode==='recovery'){if(ai.timer<=0){ai.mode='approach';ai.strike=null;}return;}
-    if(ai.timer>0)return;
+    if(ai.mode==='recovery'){spaceAutomaton(e,pattern,dt);if(ai.timer<=0){ai.mode='approach';ai.strike=null;}return;}
+    if(ai.timer>0){spaceAutomaton(e,pattern,dt);return;}
     const d=distance(e,p);
     if(d>pattern.range*.85){
-      if(e.knock>0)return;
-      const x=(p.x-e.x)/d,y=(p.y-e.y)/d,speed=MONSTERS.automaton.speed;
-      if(canStand(e.x+x*speed*dt,e.y,16))e.x+=x*speed*dt;
-      if(canStand(e.x,e.y+y*speed*dt,16))e.y+=y*speed*dt;
+      moveAutomaton(e,(p.x-e.x)/d,(p.y-e.y)/d,dt);
       return;
     }
     const length=d||1;
@@ -392,7 +407,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
       ctx.globalAlpha=1;ctx.beginPath();ctx.moveTo(strike.tx-8,strike.ty);ctx.lineTo(strike.tx+8,strike.ty);ctx.moveTo(strike.tx,strike.ty-8);ctx.lineTo(strike.tx,strike.ty+8);ctx.stroke();
     }else{
       ctx.translate(strike.x,strike.y);ctx.rotate(Math.atan2(strike.vy,strike.vx));ctx.beginPath();
-      if(pattern.id==='sword'){ctx.moveTo(0,0);ctx.arc(0,0,pattern.range,-Math.PI/3,Math.PI/3);ctx.closePath();ctx.stroke();ctx.globalAlpha*=.4;ctx.fill();}
+      if(pattern.id==='sword'){ctx.moveTo(0,0);ctx.arc(0,0,pattern.range,-pattern.halfAngle,pattern.halfAngle);ctx.closePath();ctx.stroke();ctx.globalAlpha*=.4;ctx.fill();}
       if(pattern.id==='spear'){ctx.rect(0,-pattern.width/2,pattern.range,pattern.width);ctx.stroke();ctx.globalAlpha*=.4;ctx.fill();}
       if(pattern.id==='bow'){ctx.setLineDash([10,7]);ctx.moveTo(0,0);ctx.lineTo(pattern.range,0);ctx.stroke();}
     }
@@ -767,11 +782,14 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
       ctx.restore();
       // Keep the Ninja Adventure slash at hand height while moving. Only its
       // direction stays locked; damage was already resolved at strike.x/y.
-      ctx.save();ctx.translate(p.x,p.y-21);ctx.rotate(angle);ctx.translate(37,0);
+      ctx.save();
+      // Bound the slash art to the same 70px / 90-degree footprint as the hit.
+      ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.arc(p.x,p.y,MELEE.range,angle-halfAngle,angle+halfAngle);ctx.closePath();ctx.clip();
+      ctx.translate(p.x,p.y-21);ctx.rotate(angle);ctx.translate(MELEE.range/2,0);
       const fxCfg=CFG.sprites.slash;
       const frame=clamp(Math.floor((MELEE.duration-p.attack)*fxCfg.fps),0,fxCfg.frames-1);
       const [fw,fh]=fxCfg.size;
-      sprite(images.slash,frame*fw,0,fw,fh,-fw*fxCfg.scale/2,-fh*fxCfg.scale/2,fw*fxCfg.scale,fh*fxCfg.scale);
+      sprite(images.slash,frame*fw,0,fw,fh,-MELEE.range/2,-MELEE.range/2,MELEE.range,MELEE.range);
       ctx.restore();
     }
   }
