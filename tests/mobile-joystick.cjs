@@ -9,7 +9,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
    const context=await browser.newContext({viewport,isMobile:true,hasTouch:true,deviceScaleFactor:1});
    const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:html.replace('  preload().catch(error=>{',`
-    window.mobileTest={update,reset,inputDirection,newEnemy,get state(){return state;},get touch(){return {...touch};}};
+    window.mobileTest={update,reset:(area='forest')=>reset(area),inputDirection,newEnemy,get state(){return state;},get touch(){return {...touch};}};
     preload().catch(error=>{`)}));
    await page.addInitScript(()=>{window.requestAnimationFrame=()=>0;window.pointerLog=[];for(const t of ['pointerdown','pointerup','pointercancel'])window.addEventListener(t,e=>pointerLog.push({type:e.type,id:e.pointerId,target:e.target.id,pointerType:e.pointerType}));});
    await page.goto('http://alchemy.test/v0.2.html');await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));

@@ -21,6 +21,8 @@ function loadBalance(source) {
     if (!weapon || !['range','cooldown','duration','damageMultiplier'].every(key => Number.isFinite(weapon[key]) && weapon[key] > 0)) throw Error('Invalid player weapon: ' + id);
   }
   if (!(balance.weapons.bow.projectileSpeed > 0 && balance.weapons.bow.projectileRadius > 0 && balance.weapons.staff.blastRadius > 0 && balance.weapons.staff.castDelay > 0)) throw Error('Invalid ranged weapon');
+  const staff = balance.weapons.staff;
+  if (!(staff.minRange >= 0 && staff.minRange <= staff.range && staff.maxChargeTime > staff.tapGrace && staff.tapGrace >= 0)) throw Error('Invalid staff charge settings');
   for (const [id, monster] of Object.entries(balance.monsters)) if (!(monster.hp > 0)) throw Error('Monster HP must be positive: ' + id);
   if (!Number.isInteger(balance.quests.slimeTraining.requiredKills) || !Number.isInteger(balance.progression.initialLevel) || balance.progression.initialLevel < 1) throw Error('Quest kills and initial level must be positive integers');
   if (!(balance.weapons.sword.arcDegrees > 0 && balance.weapons.sword.arcDegrees <= 360)) throw Error('Invalid sword cone');

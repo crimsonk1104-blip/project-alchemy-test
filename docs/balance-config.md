@@ -78,4 +78,7 @@ done
 
 ## v0.9 플레이어 추가 무기
 
-`weapons.spear`, `weapons.bow`, `weapons.staff`를 추가했다. 무기별 `damageMultiplier`(기본 공격력 배율), `range`, `duration`, `cooldown`, `buffer`, `knockback`, `knockDuration`, `hitFlash`가 실제 공격에 적용된다. 활의 `projectileSpeed`, `projectileRadius`, 지팡이의 `blastRadius`, `castDelay`, `effectDuration`, 두 원거리 무기의 `aimAssistDegrees`도 같은 설정에서 관리한다. 검 배율은1로 기존 피해를 유지한다. 자세한 임시 수치와 장비 적용 범위는 [플레이어 무기 문서](player-four-weapons.md)를 참고한다.
+`weapons.spear`, `weapons.bow`, `weapons.staff`를 추가했다. 무기별 `damageMultiplier`(기본 공격력 배율), `range`, `duration`, `cooldown`, `buffer`, `knockback`, `knockDuration`, `hitFlash`가 실제 공격에 적용된다. 활의 `projectileSpeed`, `projectileRadius`, 지팡이의 `blastRadius`, `castDelay`, `effectDuration`, 활의 `aimAssistDegrees`도 같은 설정에서 관리한다. 검 배율은1로 기존 피해를 유지한다. 자세한 임시 수치와 장비 적용 범위는 [플레이어 무기 문서](player-four-weapons.md)를 참고한다.
+
+
+지팡이 수동 조준 설정도 `weapons.staff`에 있다: `minRange`45, `range`240, `maxChargeTime`0.7초, `tapGrace`0.08초, `blastRadius`48, `cooldown`0.9초, `castDelay`0.35초. 충전 피해 증가는 없다. `aimAssistDegrees`는 지팡이에서 제거했으며 활에만 적용한다. 빌드 시 최소/최대 거리와 충전 시간 범위를 검증한다.

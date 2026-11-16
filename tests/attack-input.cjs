@@ -19,7 +19,7 @@ const assert=require('node:assert/strict');
   await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
   const observations=()=>page.evaluate(()=>attackObservations);
   const diagnostic=()=>page.locator('#input-diagnostics').innerText();
-  const restart=async()=>{await page.locator('#reset-btn').click();await page.evaluate(()=>attackObservations.length=0);};
+  const restart=async()=>{await page.locator('#reset-btn').click();await page.locator('#forest-btn').click();await page.evaluate(()=>attackObservations.length=0);};
   const report=[];
   for(const dirs of [['ArrowUp','ArrowRight'],['ArrowDown','ArrowRight'],['ArrowDown','ArrowLeft'],['ArrowUp','ArrowLeft']]){
    for(const key of ['Space','j']){
@@ -62,7 +62,7 @@ const assert=require('node:assert/strict');
    await restart();await page.keyboard.down('Space');
    if(action==='blur')await page.evaluate(()=>window.dispatchEvent(new Event('blur')));
    if(action==='pause'){await page.keyboard.press('Escape');await page.keyboard.press('Escape');}
-   if(action==='restart')await page.locator('#reset-btn').click();
+   if(action==='restart'){await page.locator('#reset-btn').click();await page.locator('#forest-btn').click();}
    const before=(await observations()).length;await page.keyboard.down('Space');await page.waitForTimeout(450);assert.equal((await observations()).length,before,action);await page.keyboard.up('Space');
   }
   // No received event vs a received attack which misses are visible separately.

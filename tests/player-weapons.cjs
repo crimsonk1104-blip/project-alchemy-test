@@ -1,7 +1,7 @@
 const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});try{
  const html=fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8'),errors=[];
- const instrument=html.replace('  preload().catch(error=>{',`window.weaponTest={images,prepareEvaluationReport,selectRegion,selectTrialWeapon,update,updatePlayerAttacks,attack,newEnemy,draw,reset,equipItem,unequipItem,calculateAttackDamage,assistedDirection,get state(){return state;}};\n  preload().catch(error=>{`);
+ const instrument=html.replace('  preload().catch(error=>{',`window.weaponTest={images,prepareEvaluationReport,selectRegion,selectTrialWeapon,update,updatePlayerAttacks,beginStaffAim,updateStaffAim,finishStaffAim,attack:()=>{if(state.activeWeapon==='staff'){if(beginStaffAim('fixture')){updateStaffAim(B.weapons.staff.tapGrace+(B.weapons.staff.maxChargeTime-B.weapons.staff.tapGrace)*(150-B.weapons.staff.minRange)/(B.weapons.staff.range-B.weapons.staff.minRange));finishStaffAim('fixture');}}else attack();},newEnemy,draw,reset,equipItem,unequipItem,calculateAttackDamage,assistedDirection,get state(){return state;}};\n  preload().catch(error=>{`);
  const p=await b.newPage();p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>window.requestAnimationFrame=()=>0);await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await p.goto('http://alchemy.test/');await p.waitForSelector('#region-dialog[open]');
  const results=await p.evaluate(()=>{
   const g=weaponTest,check=(v,m)=>{if(!v)throw Error(m);},result=[];
@@ -62,10 +62,10 @@ const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:
    await q.evaluate(()=>weaponTest.selectRegion('lobby'));await q.locator('#region-btn').tap();await q.waitForSelector('#region-dialog[open]');await q.locator('#weapon-'+weapon).tap();await q.locator('#forest-btn').tap();await q.waitForSelector('#region-dialog[open]',{state:'hidden'});
    if(!(await q.locator('.play-screen').count())){await q.locator('#play-mode-btn').tap();await q.waitForSelector('.play-screen');}
    const setup=()=>q.evaluate(weapon=>{const g=weaponTest,p=g.state.player;p.cool=0;p.attack=0;p.aim={x:1,y:0};g.state.playerShots=[];g.state.playerMagic=[];g.state.enemies=[g.newEnemy(p.x+(weapon==='sword'?50:weapon==='spear'?100:150),p.y+(weapon==='bow'||weapon==='staff'?35:0))];},weapon);
-   await setup();await q.keyboard.down('ArrowRight');await q.keyboard.press('Space');await q.keyboard.up('ArrowRight');const pc=await q.evaluate(()=>weaponTest.state.player.strike.direction);
+   await setup();await q.keyboard.down('ArrowRight');if(weapon==='staff'){await q.keyboard.down('Space');await q.evaluate(()=>weaponTest.updateStaffAim(.4));await q.keyboard.up('Space');}else await q.keyboard.press('Space');await q.keyboard.up('ArrowRight');const pc=await q.evaluate(()=>weaponTest.state.player.strike.direction);
    await setup();const stick=await q.locator('#joystick').boundingBox(),atk=await q.locator('#attack-btn').boundingBox(),cd=await ctx.newCDPSession(q);
    await cd.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{id:1,x:stick.x+stick.width/2+30,y:stick.y+stick.height/2},{id:2,x:atk.x+atk.width/2,y:atk.y+atk.height/2}]});await q.waitForTimeout(45);
-   const touch=await q.evaluate(()=>weaponTest.state.player.strike.direction);assert.ok(Math.abs(pc.x-touch.x)<1e-10&&Math.abs(pc.y-touch.y)<1e-10,'PC/touch aim parity');
+   if(weapon==='staff'){await q.evaluate(()=>weaponTest.updateStaffAim(.4));await cd.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[{id:2,x:atk.x+atk.width/2,y:atk.y+atk.height/2}]});}const touch=await q.evaluate(()=>weaponTest.state.player.strike.direction);assert.ok(Math.abs(pc.x-touch.x)<1e-10&&Math.abs(pc.y-touch.y)<1e-10,'PC/touch aim parity');
    await q.evaluate(()=>{weaponTest.updatePlayerAttacks(.5);weaponTest.draw();});assert.equal(await q.evaluate(()=>weaponTest.state.enemies[0].hp),weapon==='staff'?1:2);await cd.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
    if(viewport.width===844)await q.screenshot({path:'/tmp/player-weapon-'+weapon+'.png'});
   }
@@ -75,7 +75,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:
  for(const weapon of ['sword','spear','bow','staff']){
   const live=await b.newPage({viewport:{width:844,height:390}});live.on('pageerror',e=>errors.push(e.message));await live.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await live.goto('http://alchemy.test/');await live.waitForSelector('#region-dialog[open]');await live.locator('#weapon-'+weapon).click();await live.locator('#forest-btn').click();await live.locator('#play-mode-btn').click();
   await live.evaluate(weapon=>{const g=weaponTest;g.state.enemies=[g.newEnemy(g.state.player.x+(weapon==='sword'?60:weapon==='spear'?120:180),g.state.player.y)];window.liveTarget=g.state.enemies[0];},weapon);
-  await live.keyboard.press('Space');await live.waitForTimeout(60);await live.screenshot({path:'/tmp/player-live-'+weapon+'.png'});await live.waitForTimeout(550);assert.equal(await live.evaluate(()=>liveTarget.hp),weapon==='staff'?1:2);console.log('PASS live native input hit',weapon);await live.close();
+  if(weapon==='staff'){await live.keyboard.down('Space');await live.waitForTimeout(430);await live.keyboard.up('Space');}else await live.keyboard.press('Space');await live.waitForTimeout(60);await live.screenshot({path:'/tmp/player-live-'+weapon+'.png'});await live.waitForTimeout(550);assert.equal(await live.evaluate(()=>liveTarget.hp),weapon==='staff'?1:2);console.log('PASS live native input hit',weapon);await live.close();
  }
  assert.deepEqual(errors,[]);
 }finally{await b.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

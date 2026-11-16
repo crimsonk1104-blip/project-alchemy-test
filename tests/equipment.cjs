@@ -2,7 +2,7 @@ const {chromium}=require('playwright');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});try{
  const html=fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();started=true;openRegionMenu();',"createGround();bindInput();reset();started=true;selectRegion('forest');"),errors=[];
- const instrument=html.replace('  preload().catch(error=>{',`window.eq={reset,update,draw,attack,newEnemy,rewardDefeat,equipItem,unequipItem,calculateAttackDamage,calculateStats,get state(){return state;},get paused(){return paused;},get touch(){return {...touch};}};\n  preload().catch(error=>{`);
+ const instrument=html.replace('  preload().catch(error=>{',`window.eq={reset:(area='forest')=>reset(area),update,draw,attack,newEnemy,rewardDefeat,equipItem,unequipItem,calculateAttackDamage,calculateStats,get state(){return state;},get paused(){return paused;},get touch(){return {...touch};}};\n  preload().catch(error=>{`);
  for(const viewport of [{width:1280,height:800},{width:360,height:640},{width:844,height:390},{width:820,height:1180},{width:1180,height:820}]){
   const ctx=await b.newContext({viewport,hasTouch:true,isMobile:viewport.width!==1280});const p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.message));
   await p.addInitScript(()=>window.requestAnimationFrame=()=>0);await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await p.goto('http://alchemy.test/');await p.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
@@ -30,7 +30,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
   const session=await ctx.newCDPSession(p),stick=await p.locator('#joystick').boundingBox(),atk=await p.locator('#attack-btn').boundingBox();
   await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{id:1,x:stick.x+stick.width/2+25,y:stick.y+stick.height/2-25},{id:2,x:atk.x+atk.width/2,y:atk.y+atk.height/2}]});await p.waitForTimeout(50);
   assert.equal(await p.evaluate(()=>eq.touch.pointerId!==null&&eq.touch.attackId!==null),true);await p.evaluate(()=>eq.update(.1));await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-  await p.locator('#reset-btn').tap();assert.deepEqual(await p.evaluate(()=>({gear:eq.state.inventory.equipment,slots:eq.state.equipment,damage:eq.calculateAttackDamage()})),{gear:{},slots:{weapon:null},damage:1});
+  await p.locator('#reset-btn').tap();await p.locator('#forest-btn').tap();assert.deepEqual(await p.evaluate(()=>({gear:eq.state.inventory.equipment,slots:eq.state.equipment,damage:eq.calculateAttackDamage()})),{gear:{},slots:{weapon:null},damage:1});
   // Reload must reset an actually equipped character, rather than an already empty state.
   await p.evaluate(()=>{for(let i=0;i<3;i++){const e=eq.newEnemy(550,342);e.hp=0;eq.state.enemies.push(e);eq.rewardDefeat(e);}eq.equipItem('trainingSword');});assert.equal(await p.evaluate(()=>eq.calculateAttackDamage()),2);
   await p.reload();await p.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));assert.deepEqual(await p.evaluate(()=>({gear:eq.state.inventory.equipment,slots:eq.state.equipment,damage:eq.calculateAttackDamage()})),{gear:{},slots:{weapon:null},damage:1});
