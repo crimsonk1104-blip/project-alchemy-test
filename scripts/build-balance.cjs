@@ -16,6 +16,11 @@ function loadBalance(source) {
   for (const [name, value] of Object.entries({ hp: balance.player.maxHp, speed: balance.player.moveSpeed, cooldown: balance.weapons.sword.cooldown, range: balance.weapons.sword.range, minimumDamage: balance.combat.minimumAttackDamage, questKills: balance.quests.slimeTraining.requiredKills, xpBase: balance.progression.xpBase, frameDt: balance.combat.maxFrameDt, protectedHp: balance.automaton.protectedHp })) {
     if (!(value > 0)) throw Error(name + ' must be positive');
   }
+  for (const id of ['sword','spear','bow','staff']) {
+    const weapon = balance.weapons[id];
+    if (!weapon || !['range','cooldown','duration','damageMultiplier'].every(key => Number.isFinite(weapon[key]) && weapon[key] > 0)) throw Error('Invalid player weapon: ' + id);
+  }
+  if (!(balance.weapons.bow.projectileSpeed > 0 && balance.weapons.bow.projectileRadius > 0 && balance.weapons.staff.blastRadius > 0 && balance.weapons.staff.castDelay > 0)) throw Error('Invalid ranged weapon');
   for (const [id, monster] of Object.entries(balance.monsters)) if (!(monster.hp > 0)) throw Error('Monster HP must be positive: ' + id);
   if (!Number.isInteger(balance.quests.slimeTraining.requiredKills) || !Number.isInteger(balance.progression.initialLevel) || balance.progression.initialLevel < 1) throw Error('Quest kills and initial level must be positive integers');
   if (!(balance.weapons.sword.arcDegrees > 0 && balance.weapons.sword.arcDegrees <= 360)) throw Error('Invalid sword cone');

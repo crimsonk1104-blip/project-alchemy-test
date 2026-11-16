@@ -8,7 +8,10 @@
     player: { maxHp: 100, moveSpeed: 178, radius: 17, baseStats: { attack: 1 }, levelUpHeal: 20 },
     weapons: {
       sword: { range: 70, arcDegrees: 90, duration: .24, cooldown: .39, buffer: .13,
-        knockback: 16, knockDuration: .10, hitFlash: .19 }
+        knockback: 16, knockDuration: .10, hitFlash: .19, damageMultiplier: 1 },
+      spear: { range: 155, width: 20, duration: .22, cooldown: .58, buffer: .13, damageMultiplier: 1, knockback: 12, knockDuration: .10, hitFlash: .19 },
+      bow: { range: 380, projectileSpeed: 440, projectileRadius: 6, duration: .2, cooldown: .65, buffer: .13, damageMultiplier: 1, aimAssistDegrees: 20, knockback: 5, knockDuration: .08, hitFlash: .15 },
+      staff: { range: 240, blastRadius: 48, castDelay: .35, effectDuration: .22, duration: .25, cooldown: .9, buffer: .13, damageMultiplier: 2, aimAssistDegrees: 20, knockback: 6, knockDuration: .08, hitFlash: .19 }
     },
     monsters: {
       slime: { name: '슬라임', hp: 3, speed: 42, damage: 9, radius: 19, collisionRadius: 16,

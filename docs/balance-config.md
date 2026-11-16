@@ -75,3 +75,7 @@ done
 ```
 
 실제 모바일 조작감과 iOS Safari 엔진 검증은 별도다. 숫자 변경 후에는 관련 테스트의 기대값도 새 의도에 맞게 검토하되, 실패를 숨기기 위해 검증을 삭제하지 않는다.
+
+## v0.9 플레이어 추가 무기
+
+`weapons.spear`, `weapons.bow`, `weapons.staff`를 추가했다. 무기별 `damageMultiplier`(기본 공격력 배율), `range`, `duration`, `cooldown`, `buffer`, `knockback`, `knockDuration`, `hitFlash`가 실제 공격에 적용된다. 활의 `projectileSpeed`, `projectileRadius`, 지팡이의 `blastRadius`, `castDelay`, `effectDuration`, 두 원거리 무기의 `aimAssistDegrees`도 같은 설정에서 관리한다. 검 배율은1로 기존 피해를 유지한다. 자세한 임시 수치와 장비 적용 범위는 [플레이어 무기 문서](player-four-weapons.md)를 참고한다.
