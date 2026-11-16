@@ -7,7 +7,7 @@ const assert=require('node:assert/strict');
  try{
   const page=await browser.newPage({viewport:{width:1440,height:1100}}),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
-  const html=fs.readFileSync(require('node:path').join(__dirname,'../v0.2.html'),'utf8');
+  const html=fs.readFileSync(require('node:path').join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();started=true;openRegionMenu();',"createGround();bindInput();reset();started=true;selectRegion('forest');");
   // Observation only: no fake frames, keys, timers, or modified attack decisions.
   const observed=html.replace('  preload().catch(error=>{',`
     window.attackObservations=[];const executeAttack=attack;

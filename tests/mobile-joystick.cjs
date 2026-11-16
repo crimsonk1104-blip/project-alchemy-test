@@ -4,7 +4,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});
  try{
-  const html=fs.readFileSync(require('node:path').join(__dirname,'../v0.2.html'),'utf8');
+  const html=fs.readFileSync(require('node:path').join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();started=true;openRegionMenu();',"createGround();bindInput();reset();started=true;selectRegion('forest');");
   for(const viewport of [{width:360,height:640},{width:390,height:844},{width:844,height:390},{width:820,height:1180},{width:1180,height:820}]){
    const context=await browser.newContext({viewport,isMobile:true,hasTouch:true,deviceScaleFactor:1});
    const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));

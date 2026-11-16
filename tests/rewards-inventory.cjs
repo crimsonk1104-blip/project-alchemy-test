@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 (async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});try{
- const html=fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8');
+ const html=fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();started=true;openRegionMenu();',"createGround();bindInput();reset();started=true;selectRegion('forest');");
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:html.replace('  preload().catch(error=>{',`window.rewardsTest={reset,update,attack,newEnemy,rewardDefeat,openInventory,closeInventory,get state(){return state;},get paused(){return paused;},get touch(){return {...touch};}};\n  preload().catch(error=>{`)}));
  await page.addInitScript(()=>{window.requestAnimationFrame=()=>0;});
