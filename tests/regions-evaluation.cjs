@@ -20,8 +20,12 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  const goal=await p.evaluate(()=>{
   const g=regions,check=(v,m)=>{if(!v)throw Error(m);};check(g.state.enemies.length===1&&g.state.enemies[0].type==='automaton','one unique monster');
   const outsider=g.newEnemy(550,350);outsider.hp=0;g.state.enemies.push(outsider);check(!g.rewardDefeat(outsider),'slime cannot satisfy evaluation');g.state.enemies.pop();
-  const e=g.state.enemies[0];check(e.maxHp===6,'automaton hp');
-  for(let i=0;i<6;i++){e.x=g.state.player.x+65;e.y=g.state.player.y;g.state.player.cool=0;g.attack();g.update(.01);}
+  const e=g.state.enemies[0];check(e.maxHp===12,'automaton hp');
+  for(let phase=0;phase<4;phase++){
+    for(let frame=0;frame<80&&e.ai.used[phase]===0;frame++){g.state.player.invuln=1;g.update(.04);}
+    check(e.ai.used[phase]>0,'pattern actually executed');
+    for(let hit=0;hit<3;hit++){e.x=g.state.player.x+65;e.y=g.state.player.y;g.state.player.cool=0;g.attack();g.update(.01);}
+  }
   check(g.state.evaluation.status==='objectiveMet','goal only, not completed');check(!g.rewardDefeat(e),'duplicate evaluation');
   for(let i=0;i<50;i++)g.update(.1);check(g.state.enemies.length===0,'no training respawn');check(g.state.kills===3&&g.state.xp===15,'evaluation not counted as slime');
   check(!g.completeEvaluationAfterNpcReport(),'must prepare report');g.draw();return JSON.stringify(g.state.inventory);
