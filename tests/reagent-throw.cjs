@@ -2,7 +2,9 @@ const {chromium}=require('playwright');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
 (async()=>{
   const root=path.join(__dirname,'..');
-  assert.equal(fs.readFileSync(path.join(root,'balance-config.js'),'utf8'),execFileSync('git',['show','98fc38a:balance-config.js'],{cwd:root,encoding:'utf8'}),'preserve every balance value');
+  const vm=require('vm'),before={},current={};vm.runInNewContext(execFileSync('git',['show','98fc38a:balance-config.js'],{cwd:root,encoding:'utf8'}),before);vm.runInNewContext(fs.readFileSync(path.join(root,'balance-config.js'),'utf8'),current);
+  for(const key of ['player','weapons','monsters','automaton','progression','quests','spawning','combat'])assert.equal(JSON.stringify(current.ALCHEMY_BALANCE[key]),JSON.stringify(before.ALCHEMY_BALANCE[key]),'unchanged combat '+key);
+  assert.equal(current.ALCHEMY_BALANCE.rewards.quests.slimeTraining.items.upgradeStone,1);assert.equal(current.ALCHEMY_BALANCE.equipment.trainingSword,undefined);
   const html=fs.readFileSync(path.join(root,'v0.2.html'),'utf8');
   const instrument=html.replace('  preload().catch(error=>{',`window.reagentTest={groundTarget,groundAttackProfile,updateGroundAim,updateAreaAttacks,update,draw,drawGroundAim,drawReagentAttack,reagentFlightPose,selectRegion,selectTrialWeapon,newEnemy,AREA_RENDERERS,get state(){return state;},get rules(){return B.weapons.staff;},get paused(){return paused;}};\n  preload().catch(error=>{`);
   const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'}),errors=[];

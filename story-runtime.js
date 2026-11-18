@@ -1,12 +1,12 @@
   // Scene progression is separate from dialogue data and combat simulation.
   const STORY=globalThis.ALCHEMY_STORY;
-  const STARTERS={sword:{id:'starterSword',name:'초기 지급 검'},spear:{id:'starterSpear',name:'초기 지급 창'},bow:{id:'starterBow',name:'초기 지급 활'},staff:{id:'starterStaff',name:'초기 지급 지팡이 · 시약 투척 시험'}};
+  const STARTERS={sword:{id:'starterSword',name:'초기 지급 검'},spear:{id:'starterSpear',name:'초기 지급 창'},bow:{id:'starterBow',name:'초기 지급 활'},staff:{id:'starterStaff',name:'초기 지급 연금 도구'}};
   function starterStyle(id){return Object.keys(STARTERS).find(k=>STARTERS[k].id===id);}
   function grantStarter(style){const item=STARTERS[style];if(!item)return;state.inventory.equipment[item.id]=1;}
   function chooseStarter(style){
     if(state.area!=='lobby'||!state.story?.name||!STARTERS[style])return false;
     // One initial grant, or an exchange: previous starter is returned, never duplicated.
-    if(!state.story.cabinet){for(const item of Object.values(STARTERS))delete state.inventory.equipment[item.id];}
+    for(const item of Object.values(STARTERS))delete state.inventory.equipment[item.id];
     grantStarter(style);state.story.weapon=style;state.equipment.weapon=STARTERS[style].id;
     selectTrialWeapon(style);updateUi();return true;
   }
@@ -30,7 +30,7 @@
       storyButton(host,'story-report','소장에게 보고',()=>{q.scene=5;q.line=0;q.phase='dialogue';renderStory();});return;
     }
     if(q.phase==='complete'){
-      text('장비 보관함 개방 · 초기 지급 장비 무료 교환 가능. 강화 기능은 아직 없습니다.');
+      text('장비 보관함 개방 · 초기 장비 1개 무료 교환, 기존 장비는 반납합니다. 강화 기능은 아직 없습니다.');
       renderStarterChoices(host,true);storyButton(host,'story-cabinet','장비 보관함 열기',()=>{closeRegionMenu();openInventory();});storyButton(host,'story-forest','연금의 숲 · 별도 슬라임 퀘스트',()=>selectRegion('forest'));return;
     }
     if(q.reselectWeapon){text('전투 전 무기 변경 · 선택 후 준비 화면으로 돌아갑니다.');renderStarterChoices(host,true);return;}
@@ -71,7 +71,7 @@
     if(q.line>=scene.lines.length){
       if(q.scene===4){q.phase='evaluation';selectRegion('training');return;}
       if(q.scene===5)completeEvaluationAfterNpcReport();
-      if(q.scene===6){q.cabinet=true;for(const style of Object.keys(STARTERS))grantStarter(style);}
+      if(q.scene===6)q.cabinet=true;
       if(q.scene===8){q.phase='complete';renderStory();return;}
       q.scene++;q.line=0;
     }

@@ -43,7 +43,7 @@ HTML 안의 생성된 설정 복사본은 직접 수정하지 않는다. 숫자 
 | 시작·전환 대기 / 접근·측면 이동 비율 | `automaton.initialDelay`, `transitionDelay`, `approachRatio`, `strafeRatio` | 0.4, 0.25, 0.85, 0.45 |
 | 자동인형 피격 후 무적·이펙트 수명·단계 보호 | `automaton.damageInvulnerability`, `effectDuration`, `protectedHp` | 0.7, 0.22, 1 |
 | 화살 속도·수명 | `automaton.projectile.speed`, `lifetime` | 310, 2 |
-| 훈련검 공격력 보너스 | `equipment.trainingSword.bonuses.attack` | +1; 설명과 미리보기에도 반영 |
+| 초기 장비 능력치 | `equipment.starterSword/starterSpear/starterBow/starterStaff.bonuses.attack` | 모두 0; 공통 능력치 계산과 UI에 반영 |
 | 시작 레벨·레벨업 필요 경험치 | `progression.initialLevel`, `xpBase`, `xpPerLevel` | 1, 30, 레벨당 +15 |
 | 슬라임 퀘스트 처치 수 | `quests.slimeTraining.requiredKills` | 3; 진행 UI·지급 조건에 함께 반영 |
 | 처치·퀘스트 보상 | `rewards.monsters`, `rewards.quests` | XP, 재화, 재료, 장비 수량. 기존 중복 지급 방지 유지 |
@@ -85,3 +85,5 @@ done
 
 
 시약 투척 시험에서도 내부 `weapons.staff` 수치를 그대로 사용한다. `castDelay`0.35초는 비행 및 착탄 대기 시간, `effectDuration`0.22초는 착탄 후 시약 표현의 잔존 시간이다. `AREA_STYLES`의 색상·포물선 높이는 표현 전용이며 전투 수치에 영향을 주지 않는다. 정식 무기 분류나 신규 밸런스 확정이 아니다.
+
+초기 장비 정리: 슬라임 퀘스트 `rewards.quests.slimeTraining.items.upgradeStone`은1이다. EXP15·연금화폐20·점액2는 유지한다. 과거 테스트 검 정의와 보너스·장비 지급 경로는 제거했다. 강화석은 재료 카탈로그에만 있으며 강화/사용 기능은 없다.

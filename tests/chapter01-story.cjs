@@ -46,8 +46,8 @@ for(const [index,weapon] of ['sword','spear','bow','staff'].entries()){
   await p.locator('#story-next').tap();
  }
  assert.ok(acceptance);assert.equal(await p.evaluate(()=>chapter.state.evaluation.status),'complete');assert.equal(await p.evaluate(()=>chapter.state.story.cabinet),true);
- const inventory=await p.evaluate(()=>chapter.state.inventory);assert.equal(Object.keys(inventory.equipment).length,4);assert.ok(Object.values(inventory.equipment).every(n=>n===1));
- await p.locator('#story-weapon-bow').tap();await p.locator('#story-weapon-bow').tap();assert.deepEqual(await p.evaluate(()=>chapter.state.inventory),inventory);
+ const inventory=await p.evaluate(()=>chapter.state.inventory);assert.equal(Object.keys(inventory.equipment).length,1);assert.ok(Object.values(inventory.equipment).every(n=>n===1));
+ await p.locator('#story-weapon-bow').tap();await p.locator('#story-weapon-bow').tap();assert.deepEqual(await p.evaluate(()=>chapter.state.inventory.equipment),{starterBow:1});assert.deepEqual(await p.evaluate(()=>chapter.state.inventory.items),inventory.items);
  await p.screenshot({path:'/tmp/chapter01-'+weapon+'.png'});await p.locator('#story-cabinet').tap();assert.ok(await p.locator('#inventory-dialog').isVisible());await p.locator('#inventory-close').tap();assert.deepEqual(errors,[]);
  console.log('PASS CH01 name/choice/skip, '+weapon+' real attacks vs four phases, failure/retry, report, exact acceptance, cabinet, no duplicate exchange, mobile UI');await c.close();
 }

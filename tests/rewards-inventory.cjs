@@ -14,14 +14,14 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
   g.update(.01);check(!g.rewardDefeat(e),'duplicate after removal');check(g.state.kills===1,'update not duplicated');
   for(let i=0;i<2;i++){const e=g.newEnemy(550,350);e.hp=0;g.state.enemies.push(e);g.update(.01);}
   check(g.state.kills===3&&g.state.questDone&&g.state.level===2&&g.state.xp===15,'existing progression');
-  check(g.state.inventory.currencies.alchemyCoin===35&&g.state.inventory.items.slimeMucus===5,'quest once');
+  check(g.state.inventory.currencies.alchemyCoin===35&&g.state.inventory.items.slimeMucus===5&&g.state.inventory.items.upgradeStone===1&&Object.keys(g.state.inventory.equipment).length===0,'quest stone once');
   const fourth=g.newEnemy(550,350);fourth.hp=0;g.state.enemies.push(fourth);g.update(.01);g.update(.01);
-  check(g.state.inventory.currencies.alchemyCoin===40&&g.state.inventory.items.slimeMucus===6&&g.state.xp===25,'no repeated quest');
+  check(g.state.inventory.currencies.alchemyCoin===40&&g.state.inventory.items.slimeMucus===6&&g.state.xp===25&&g.state.inventory.items.upgradeStone===1,'no repeated quest');
   g.openInventory();const snapshot=JSON.stringify(g.state.player);g.update(1);g.attack();check(JSON.stringify(g.state.player)===snapshot,'modal pauses game and blocks attacks');g.closeInventory();check(!g.paused,'resume previous running state');
   return {coins:g.state.inventory.currencies.alchemyCoin,mucus:g.state.inventory.items.slimeMucus};
  });
  await page.locator('#inventory-btn').click();assert.match(await page.locator('#inventory-content').innerText(),/연금화폐 · 40개/);assert.match(await page.locator('#inventory-content').innerText(),/슬라임 점액 · 6개/);
- await page.screenshot({path:'/tmp/alchemy-inventory-populated.png'});await page.keyboard.press('Escape');assert.equal(await page.locator('#inventory-dialog').isVisible(),false);
+ assert.match(await page.locator('#inventory-content').innerText(),/초급 강화석 · 1개/);await page.screenshot({path:'/tmp/alchemy-inventory-populated.png'});await page.keyboard.press('Escape');assert.equal(await page.locator('#inventory-dialog').isVisible(),false);
  await page.locator('#pause-btn').click();await page.locator('#inventory-btn').click();await page.locator('#inventory-close').click();assert.equal(await page.evaluate(()=>rewardsTest.paused),true);
  await page.evaluate(()=>rewardsTest.reset());assert.deepEqual(await page.evaluate(()=>rewardsTest.state.inventory),{currencies:{},items:{},equipment:{}});
  await page.evaluate(()=>{const e=rewardsTest.state.enemies[0];e.hp=0;rewardsTest.rewardDefeat(e);rewardsTest.reset();if(rewardsTest.rewardDefeat(e))throw Error('stale reset enemy rewarded');});

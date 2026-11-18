@@ -9,7 +9,7 @@ const {embedBalance,loadBalance}=require('../scripts/build-balance.cjs');
  changed.monsters.slime.hp=5;changed.monsters.slime.speed=60;changed.monsters.slime.damage=7;changed.monsters.automaton.hp=20;changed.monsters.automaton.speed=110;
  changed.automaton.patterns[0].range=90;changed.automaton.patterns[0].windup=.55;changed.automaton.patterns[0].recovery=.31;changed.automaton.patterns[0].damage=6;
  changed.automaton.projectile.speed=400;changed.automaton.projectile.lifetime=1.5;
- changed.equipment.trainingSword.bonuses.attack=2;changed.progression.xpBase=40;changed.progression.xpPerLevel=20;changed.quests.slimeTraining.requiredKills=4;
+ changed.equipment.starterSword.bonuses.attack=2;changed.progression.xpBase=40;changed.progression.xpPerLevel=20;changed.quests.slimeTraining.requiredKills=4;
  changed.rewards.monsters.slime.currencies.alchemyCoin=11;changed.rewards.monsters.slime.items.slimeMucus=2;changed.rewards.quests.slimeTraining.items.slimeMucus=4;
  const variantSource='globalThis.ALCHEMY_BALANCE = '+JSON.stringify(changed)+';';
  assert.throws(()=>embedBalance(html,variantSource.replace('"maxHp":140','"maxHp":-1')),/Invalid number/);
@@ -18,10 +18,10 @@ const {embedBalance,loadBalance}=require('../scripts/build-balance.cjs');
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});try{
   const results={};const errors=[];
   for(const [name,body] of [['before',baseline],['default',html],['changed',embedBalance(html,variantSource)]]){
-   const page=await browser.newPage();page.on('pageerror',e=>errors.push(e.message));
+   const page=await browser.newPage();page.on('pageerror',e=>{errors.push(e.message);console.error(name,e.message);});
    const requests=[];page.on('request',r=>requests.push(r.url()));
    await page.addInitScript(()=>window.requestAnimationFrame=()=>0);
-   await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:body.replace('  preload().catch(error=>{',`window.balanceTest={MELEE,MONSTERS,AUTOMATON_PATTERNS,EQUIPMENT,MONSTER_REWARDS,QUEST_REWARDS,calculateStats,calculateAttackDamage,requiredXp,reset,selectRegion,update,attack,newEnemy,rewardDefeat,equipItem,damageAutomaton,updateAutomaton,get state(){return state;}};\n  preload().catch(error=>{`)}));
+   await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:body.replace('  preload().catch(error=>{',`window.balanceTest={MELEE,MONSTERS,AUTOMATON_PATTERNS,EQUIPMENT,MONSTER_REWARDS,QUEST_REWARDS,calculateStats,calculateAttackDamage,chooseStarter:typeof chooseStarter==='function'?chooseStarter:null,requiredXp,reset,selectRegion,update,attack,newEnemy,rewardDefeat,equipItem,damageAutomaton,updateAutomaton,get state(){return state;}};\n  preload().catch(error=>{`)}));
    await page.goto('http://alchemy.test/?test=1');await page.waitForSelector('#region-dialog[open]');await page.locator('#forest-btn').click();
    const snapshot=await page.evaluate(()=>{const g=balanceTest;return {hp:g.state.player.hp,damage:g.calculateAttackDamage(),melee:g.MELEE,monsters:Object.fromEntries(Object.entries(g.MONSTERS).map(([key,m])=>[key,{hp:m.hp,speed:m.speed,damage:m.damage,name:m.name}])),patterns:g.AUTOMATON_PATTERNS,equipment:g.EQUIPMENT,rewards:[g.MONSTER_REWARDS,g.QUEST_REWARDS],xp:g.requiredXp()};});
    // New config includes extra melee metadata; compare every previously present field.
@@ -30,9 +30,13 @@ const {embedBalance,loadBalance}=require('../scripts/build-balance.cjs');
     const comparable=structuredClone(snapshot);comparable.melee=results.before.melee;
     // Approved UI labels and additive starter catalog are new; retain every baseline numeric/gear assertion.
     comparable.patterns=comparable.patterns.map((p,i)=>{const old=results.before.patterns[i];assert.equal(p.name,['검술','창술','궁술','범위 마법'][i]);return {...p,name:old.name,hint:old.hint};});
-    for(const [id,item] of Object.entries(results.before.equipment))assert.deepEqual(snapshot.equipment[id],item);
+    assert.equal(snapshot.equipment.trainingSword,undefined,'retired test item removed');
     const starters=Object.entries(snapshot.equipment).filter(([id])=>!(id in results.before.equipment));assert.equal(starters.length,4);for(const [,item] of starters)assert.equal(item.bonuses.attack,0);
-    comparable.equipment=results.before.equipment;assert.deepEqual(comparable,results.before,'all default values unchanged');
+    comparable.equipment=results.before.equipment;
+    const newReward=snapshot.rewards[1].slimeTraining,oldReward=results.before.rewards[1].slimeTraining;
+    assert.equal(newReward.items.upgradeStone,1);assert.equal(newReward.equipment,undefined);assert.equal(newReward.xp,oldReward.xp);assert.deepEqual(newReward.currencies,oldReward.currencies);assert.equal(newReward.items.slimeMucus,oldReward.items.slimeMucus);
+    delete comparable.rewards[1].slimeTraining.items.upgradeStone;comparable.rewards[1].slimeTraining.equipment=oldReward.equipment;
+    assert.deepEqual(comparable,results.before,'all default values unchanged');
     assert.equal(await page.evaluate(()=>Object.isFrozen(ALCHEMY_BALANCE.player.baseStats)),true);
    }
    results[name]=snapshot;
@@ -47,9 +51,9 @@ const {embedBalance,loadBalance}=require('../scripts/build-balance.cjs');
      for(let i=0;i<4;i++){const dead=g.newEnemy(550,350);dead.hp=0;g.state.enemies.push(dead);g.rewardDefeat(dead);}
      if(g.state.player.hp!==103||g.state.level!==2||g.state.xp!==15)throw Error('configured progression/heal');
      if(g.state.inventory.currencies.alchemyCoin!==64||g.state.inventory.items.slimeMucus!==12)throw Error('configured rewards');
-     g.equipItem('trainingSword');if(g.calculateAttackDamage()!==5)throw Error('configured equipment bonus');
+     g.selectRegion('lobby');g.state.story.name='밸런스검증';g.chooseStarter('sword');g.equipItem('starterSword');if(g.calculateAttackDamage()!==5)throw Error('configured equipment bonus');
     });
-    await page.locator('#inventory-btn').click();assert.match(await page.locator('#equipment-content').innerText(),/공격력 5/);assert.match(await page.locator('#equipment-content').innerText(),/피해량 \+2/);await page.locator('#inventory-close').click();
+    await page.locator('#inventory-btn').click();assert.match(await page.locator('#equipment-content').innerText(),/공격력 5/);assert.match(await page.locator('#equipment-content').innerText(),/보너스 \+2/);await page.locator('#inventory-close').click();
     await page.evaluate(()=>{
      const g=balanceTest;g.selectRegion('training');const e=g.state.enemies[0];if(e.hp!==20)throw Error('configured automaton HP');
      for(let phase=0;phase<4;phase++){e.ai.used[phase]=1;g.damageAutomaton(e,999);if(e.hp!==15-phase*5)throw Error('HP-relative phase threshold');}

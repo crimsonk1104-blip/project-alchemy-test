@@ -29,9 +29,9 @@ const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:
     }
     check(e.hp<=0,'forest kill '+weapon);
    }
-   check(g.state.questDone&&g.state.kills===3&&g.state.inventory.equipment.trainingSword===1&&g.state.inventory.currencies.alchemyCoin===35&&g.state.inventory.items.slimeMucus===5,'unchanged quest rewards');
-   g.equipItem('trainingSword');check(g.calculateAttackDamage()===(weapon==='sword'?2:weapon==='staff'?2:1),'only sword receives equipment bonus');
-   for(let i=0;i<5;i++)g.equipItem('trainingSword');check(g.calculateAttackDamage()===(weapon==='sword'?2:weapon==='staff'?2:1),'no duplicate bonus');
+   check(g.state.questDone&&g.state.kills===3&&g.state.inventory.items.upgradeStone===1&&g.state.inventory.currencies.alchemyCoin===35&&g.state.inventory.items.slimeMucus===5,'unchanged quest rewards');
+   check(!g.equipItem('trainingSword')&&g.calculateAttackDamage()===(weapon==='staff'?2:1),'retired gear cannot equip or add damage');
+   for(let i=0;i<5;i++)g.equipItem('trainingSword');check(g.calculateAttackDamage()===(weapon==='staff'?2:1),'no retired bonus');
    // Full evaluation: phase guard must still require all four enemy attacks.
    g.selectRegion('training');const e=g.state.enemies[0];
    for(let frame=0;frame<1600&&g.state.evaluation.status==='active';frame++){
@@ -39,7 +39,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:
     if(g.state.player.cool<=0&&e.ai.used[e.ai.index]>0){e.x=g.state.player.x+(weapon==='sword'?50:weapon==='spear'?100:150);e.y=g.state.player.y;g.attack();}
     g.update(.04);
    }
-   check(g.state.evaluation.status==='objectiveMet'&&e.ai.used.every(n=>n>=1),'full evaluation '+weapon+' '+JSON.stringify({hp:e.hp,ai:e.ai,status:g.state.evaluation.status,shots:g.state.playerShots,aim:g.state.player.aim}));check(g.state.kills===3&&g.state.inventory.equipment.trainingSword===1,'evaluation reward isolation');check(g.prepareEvaluationReport()&&g.state.evaluation.status==='awaitingReport'&&g.state.area==='lobby','report pending '+weapon);
+   check(g.state.evaluation.status==='objectiveMet'&&e.ai.used.every(n=>n>=1),'full evaluation '+weapon+' '+JSON.stringify({hp:e.hp,ai:e.ai,status:g.state.evaluation.status,shots:g.state.playerShots,aim:g.state.player.aim}));check(g.state.kills===3&&g.state.inventory.items.upgradeStone===1,'evaluation reward isolation');check(g.prepareEvaluationReport()&&g.state.evaluation.status==='awaitingReport'&&g.state.area==='lobby','report pending '+weapon);
   }
   setup('sword');let e=g.newEnemy(g.state.player.x+110,g.state.player.y);g.state.enemies=[e];g.attack();check(e.hp===3,'sword misses at 110');
   setup('spear');e=g.newEnemy(g.state.player.x+110,g.state.player.y);g.state.enemies=[e];g.attack();check(e.hp===2,'spear longer');
@@ -51,7 +51,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:
   setup('staff');const a=g.newEnemy(g.state.player.x+150,g.state.player.y),b=g.newEnemy(g.state.player.x+160,g.state.player.y+20);g.state.enemies=[a,b];g.attack();g.updatePlayerAttacks(.36);check(a.hp===1&&b.hp===1,'magic area damages multiple targets once');
   setup('staff');e=g.newEnemy(g.state.player.x+150,g.state.player.y);g.state.enemies=[e];g.attack();e.y+=150;g.updatePlayerAttacks(.36);check(e.hp===3,'spell target locked, dodgeable');
   setup('bow');e=g.newEnemy(g.state.player.x+150,g.state.player.y+40);g.state.enemies=[e];g.attack();check(g.state.player.strike.direction.y>0&&g.state.player.aim.y===0,'limited assist does not overwrite manual intent');
-  g.selectRegion('lobby');g.state.inventory.equipment.trainingSword=1;g.equipItem('trainingSword');g.selectTrialWeapon('bow');g.selectTrialWeapon('staff');g.selectTrialWeapon('sword');check(g.calculateAttackDamage()===2&&g.state.inventory.equipment.trainingSword===1,'trial return preserves real sword');
+  g.selectRegion('lobby');g.state.inventory.equipment.starterSword=1;g.equipItem('starterSword');g.selectTrialWeapon('bow');g.selectTrialWeapon('staff');g.selectTrialWeapon('sword');check(g.calculateAttackDamage()===1&&g.state.inventory.equipment.starterSword===1,'trial return preserves owned starter');
   g.selectRegion('forest');check(!g.selectTrialWeapon('bow'),'lobby-only switch');g.selectRegion('lobby');g.selectTrialWeapon('bow');g.state.player.cool=0;g.attack();check(g.state.playerShots.length===1,'arrow spawned');g.selectTrialWeapon('staff');g.attack();check(g.state.playerShots.length===0&&g.state.playerAreas.length===0&&g.state.player.cool>=.9,'switch cancels pending attacks and preserves cooldown');
   g.reset();check(g.state.activeWeapon==='sword'&&g.calculateAttackDamage()===1&&Object.keys(g.state.inventory.equipment).length===0,'reset');return result;
  });console.log('PASS four weapons vs both enemy types, full forest and evaluation quests, ranges, swept arrow, magic, ownership and switching:',results);

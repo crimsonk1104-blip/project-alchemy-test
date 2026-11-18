@@ -29,12 +29,12 @@
         { id: 'staff', range: 620, width: 66, windup: .8, recovery: .35, minDistance: 145, maxDistance: 230, damage: 6 }
       ]
     },
-    equipment: { trainingSword: { bonuses: { attack: 1 } } },
+    equipment: { starterSword: { bonuses: { attack: 0 } }, starterSpear: { bonuses: { attack: 0 } }, starterBow: { bonuses: { attack: 0 } }, starterStaff: { bonuses: { attack: 0 } } },
     progression: { initialLevel: 1, xpBase: 30, xpPerLevel: 15 },
     quests: { slimeTraining: { requiredKills: 3 } },
     rewards: {
       monsters: { slime: { xp: 10, currencies: { alchemyCoin: 5 }, items: { slimeMucus: 1 } } },
-      quests: { slimeTraining: { xp: 15, currencies: { alchemyCoin: 20 }, items: { slimeMucus: 2 }, equipment: { trainingSword: 1 } } }
+      quests: { slimeTraining: { xp: 15, currencies: { alchemyCoin: 20 }, items: { slimeMucus: 2, upgradeStone: 1 } } }
     },
     spawning: { forestTargetCount: 2, initialDelay: 2.5, repeatDelay: 2.6, attempts: 100, distanceMin: 155, distanceMax: 340, minPlayerDistance: 150, minEnemyDistance: 80, clearanceRadius: 21 },
     combat: { minimumAttackDamage: 1, maxFrameDt: .04 }

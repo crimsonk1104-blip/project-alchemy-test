@@ -11,7 +11,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
   const g=regions,check=(v,m)=>{if(!v)throw Error(m);};check(!g.completeEvaluationAfterNpcReport(),'no premature completion');
   for(let i=0;i<3;i++){const e=g.newEnemy(550,342);g.state.enemies=[e];for(let hit=0;hit<3;hit++){e.x=g.state.player.x+65;e.y=g.state.player.y;g.state.player.cool=0;g.attack();g.update(.01);}}
   check(g.state.kills===3&&g.state.questDone&&g.state.level===2&&g.state.xp===15,'forest quest unchanged');
-  check(g.state.inventory.currencies.alchemyCoin===35&&g.state.inventory.items.slimeMucus===5&&g.state.inventory.equipment.trainingSword===1,'forest rewards unchanged');
+  check(g.state.inventory.currencies.alchemyCoin===35&&g.state.inventory.items.slimeMucus===5&&g.state.inventory.items.upgradeStone===1,'forest rewards unchanged');
   check(g.state.evaluation.status==='notStarted','forest cannot advance evaluation');return JSON.stringify(g.state.inventory);
  });
  await p.locator('#region-btn').click();await p.locator('#training-btn').click();
