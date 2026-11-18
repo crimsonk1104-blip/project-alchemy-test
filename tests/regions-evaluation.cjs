@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  const html=fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8'),errors=[];
  const instrument=html.replace('  preload().catch(error=>{',`window.regions={reset,update,draw,attack,newEnemy,rewardDefeat,selectRegion,prepareEvaluationReport,completeEvaluationAfterNpcReport,get state(){return state;},get paused(){return paused;},get touch(){return {...touch};}};\n  preload().catch(error=>{`);
  const p=await b.newPage();p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>window.requestAnimationFrame=()=>0);
- await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await p.goto('http://alchemy.test/');await p.waitForSelector('#region-dialog[open]');
+ await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await p.goto('http://alchemy.test/?test=1');await p.waitForSelector('#region-dialog[open]');
  assert.equal(await p.evaluate(()=>regions.state.area),'lobby');assert.match(await p.locator('#evaluation-status').innerText(),/진행 전/);
  await p.locator('#forest-btn').click();
  const before=await p.evaluate(()=>{
@@ -40,7 +40,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  await p.locator('#play-mode-btn').click();await p.locator('#fullscreen-btn').click();await p.waitForTimeout(100);assert.equal(await p.evaluate(()=>!!document.fullscreenElement),true);await p.locator('#region-btn').click();await p.waitForSelector('#region-dialog[open]');assert.equal(await p.evaluate(()=>document.fullscreenElement.contains(document.querySelector('#region-dialog'))),true);await p.locator('#forest-btn').click();assert.equal(await p.evaluate(()=>regions.state.area),'forest');await p.locator('#exit-play-btn').click();
  console.log('PASS lobby → forest quest/rewards → training 1v1 → objective met → report pending; gated future completion hook; no auto-completion, no duplicate/reward changes, retry/reset');
  for(const viewport of [{width:360,height:640},{width:844,height:390},{width:820,height:1180},{width:1180,height:820}]){
-  const ctx=await b.newContext({viewport,isMobile:true,hasTouch:true});const q=await ctx.newPage();q.on('pageerror',e=>errors.push(e.message));await q.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await q.goto('http://alchemy.test/');await q.waitForSelector('#region-dialog[open]');
+  const ctx=await b.newContext({viewport,isMobile:true,hasTouch:true});const q=await ctx.newPage();q.on('pageerror',e=>errors.push(e.message));await q.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await q.goto('http://alchemy.test/?test=1');await q.waitForSelector('#region-dialog[open]');
   const menu=await q.locator('#region-dialog').boundingBox();assert.ok(menu.x>=0&&menu.y>=0&&menu.x+menu.width<=viewport.width+1&&menu.y+menu.height<=viewport.height+1);
   await q.locator('#training-btn').tap();await q.waitForSelector('#region-dialog[open]',{state:'hidden'});await q.locator('#play-mode-btn').tap();await q.waitForSelector('.play-screen');
   const cd=await ctx.newCDPSession(q),stick=await q.locator('#joystick').boundingBox(),atk=await q.locator('#attack-btn').boundingBox();const initial=await q.evaluate(()=>({x:regions.state.player.x,y:regions.state.player.y}));

@@ -10,12 +10,12 @@ const assert = require('node:assert/strict');
     const page = await browser.newPage();
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
-    const html = fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();started=true;openRegionMenu();',"createGround();bindInput();reset();started=true;selectRegion('forest');");
-    await page.route('http://alchemy.test/', route => route.fulfill({contentType:'text/html',body:html.replace('  preload().catch(error=>{',
+    const html = fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();setupTitle();',"createGround();bindInput();reset();setupTitle();selectRegion('forest');");
+    await page.route('http://alchemy.test/?test=1', route => route.fulfill({contentType:'text/html',body:html.replace('  preload().catch(error=>{',
       `  window.testGame={reset:(area='forest')=>reset(area),attack,movement,update,drawPlayer,newEnemy,inStrike,keys,get state(){return state;},MELEE};
   preload().catch(error=>{`)}));
     await page.addInitScript(() => { window.requestAnimationFrame = () => 0; });
-    await page.goto('http://alchemy.test/');
+    await page.goto('http://alchemy.test/?test=1');
     await page.waitForFunction(() => document.querySelector('#stage-loading').classList.contains('hidden'));
     const results = await page.evaluate(() => {
       const g=window.testGame,check=(ok,label)=>{if(!ok)throw Error(label);};

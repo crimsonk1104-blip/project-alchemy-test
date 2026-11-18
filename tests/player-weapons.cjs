@@ -2,7 +2,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});try{
  const html=fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8'),errors=[];
  const instrument=html.replace('  preload().catch(error=>{',`window.weaponTest={images,prepareEvaluationReport,selectRegion,selectTrialWeapon,update,updatePlayerAttacks,beginGroundAim,updateGroundAim,finishGroundAim,attack:()=>{if(state.activeWeapon==='staff'){if(beginGroundAim('fixture')){updateGroundAim(B.weapons.staff.tapGrace+(B.weapons.staff.maxChargeTime-B.weapons.staff.tapGrace)*(150-B.weapons.staff.minRange)/(B.weapons.staff.range-B.weapons.staff.minRange));finishGroundAim('fixture');}}else attack();},newEnemy,draw,reset,equipItem,unequipItem,calculateAttackDamage,assistedDirection,get state(){return state;}};\n  preload().catch(error=>{`);
- const p=await b.newPage();p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>window.requestAnimationFrame=()=>0);await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await p.goto('http://alchemy.test/');await p.waitForSelector('#region-dialog[open]');
+ const p=await b.newPage();p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>window.requestAnimationFrame=()=>0);await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await p.goto('http://alchemy.test/?test=1');await p.waitForSelector('#region-dialog[open]');
  const results=await p.evaluate(()=>{
   const g=weaponTest,check=(v,m)=>{if(!v)throw Error(m);},result=[];
   function setup(weapon,area='forest'){g.reset('lobby');if(weapon!=='sword')g.selectTrialWeapon(weapon);g.selectRegion(area);}
@@ -57,7 +57,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:
  });console.log('PASS four weapons vs both enemy types, full forest and evaluation quests, ranges, swept arrow, magic, ownership and switching:',results);
  // Native PC/touch events share attack direction and limited assist; mobile modal and multitouch.
  for(const viewport of [{width:360,height:640},{width:844,height:390},{width:820,height:1180}]){
-  const ctx=await b.newContext({viewport,isMobile:true,hasTouch:true});const q=await ctx.newPage();q.on('pageerror',e=>errors.push(e.message));await q.addInitScript(()=>window.requestAnimationFrame=()=>0);await q.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await q.goto('http://alchemy.test/');await q.waitForSelector('#region-dialog[open]');
+  const ctx=await b.newContext({viewport,isMobile:true,hasTouch:true});const q=await ctx.newPage();q.on('pageerror',e=>errors.push(e.message));await q.addInitScript(()=>window.requestAnimationFrame=()=>0);await q.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await q.goto('http://alchemy.test/?test=1');await q.waitForSelector('#region-dialog[open]');
   for(const weapon of ['sword','spear','bow','staff']){
    await q.evaluate(()=>weaponTest.selectRegion('lobby'));await q.locator('#region-btn').tap();await q.waitForSelector('#region-dialog[open]');await q.locator('#weapon-'+weapon).tap();await q.locator('#forest-btn').tap();await q.waitForSelector('#region-dialog[open]',{state:'hidden'});
    if(!(await q.locator('.play-screen').count())){await q.locator('#play-mode-btn').tap();await q.waitForSelector('.play-screen');}
@@ -73,7 +73,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:
  }
  // Native keyboard input, real animation loop, and natural collision against moving slimes.
  for(const weapon of ['sword','spear','bow','staff']){
-  const live=await b.newPage({viewport:{width:844,height:390}});live.on('pageerror',e=>errors.push(e.message));await live.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await live.goto('http://alchemy.test/');await live.waitForSelector('#region-dialog[open]');await live.locator('#weapon-'+weapon).click();await live.locator('#forest-btn').click();await live.locator('#play-mode-btn').click();
+  const live=await b.newPage({viewport:{width:844,height:390}});live.on('pageerror',e=>errors.push(e.message));await live.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await live.goto('http://alchemy.test/?test=1');await live.waitForSelector('#region-dialog[open]');await live.locator('#weapon-'+weapon).click();await live.locator('#forest-btn').click();await live.locator('#play-mode-btn').click();
   await live.evaluate(weapon=>{const g=weaponTest;g.state.enemies=[g.newEnemy(g.state.player.x+(weapon==='sword'?60:weapon==='spear'?120:180),g.state.player.y)];window.liveTarget=g.state.enemies[0];},weapon);
   if(weapon==='staff'){await live.keyboard.down('Space');await live.waitForTimeout(430);await live.keyboard.up('Space');}else await live.keyboard.press('Space');await live.waitForTimeout(60);await live.screenshot({path:'/tmp/player-live-'+weapon+'.png'});await live.waitForTimeout(550);assert.equal(await live.evaluate(()=>liveTarget.hp),weapon==='staff'?1:2);console.log('PASS live native input hit',weapon);await live.close();
  }

@@ -1,11 +1,11 @@
 const {chromium}=require('playwright');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});try{
- const html=fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();started=true;openRegionMenu();',"createGround();bindInput();reset();started=true;selectRegion('forest');"),errors=[];
+ const html=fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();setupTitle();',"createGround();bindInput();reset();setupTitle();selectRegion('forest');"),errors=[];
  const instrument=html.replace('  preload().catch(error=>{',`window.eq={reset:(area='forest')=>reset(area),update,draw,attack,newEnemy,rewardDefeat,equipItem,unequipItem,calculateAttackDamage,calculateStats,get state(){return state;},get paused(){return paused;},get touch(){return {...touch};}};\n  preload().catch(error=>{`);
  for(const viewport of [{width:1280,height:800},{width:360,height:640},{width:844,height:390},{width:820,height:1180},{width:1180,height:820}]){
   const ctx=await b.newContext({viewport,hasTouch:true,isMobile:viewport.width!==1280});const p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.message));
-  await p.addInitScript(()=>window.requestAnimationFrame=()=>0);await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await p.goto('http://alchemy.test/');await p.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
+  await p.addInitScript(()=>window.requestAnimationFrame=()=>0);await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await p.goto('http://alchemy.test/?test=1');await p.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
   const result=await p.evaluate(()=>{
    const g=eq,check=(ok,m)=>{if(!ok)throw Error(m);};g.reset();check(g.calculateAttackDamage()===1&&!g.equipItem('trainingSword')&&!g.equipItem('unknown'),'ownership checks');
    for(let i=0;i<3;i++){

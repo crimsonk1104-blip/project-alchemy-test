@@ -4,7 +4,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});
  try{
-  const html=fs.readFileSync(require('node:path').join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();started=true;openRegionMenu();',"createGround();bindInput();reset();started=true;selectRegion('forest');");
+  const html=fs.readFileSync(require('node:path').join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();setupTitle();',"createGround();bindInput();reset();setupTitle();selectRegion('forest');");
   for(const viewport of [{width:360,height:640},{width:390,height:844},{width:844,height:390},{width:820,height:1180},{width:1180,height:820}]){
    const context=await browser.newContext({viewport,isMobile:true,hasTouch:true,deviceScaleFactor:1});
    const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -12,7 +12,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
     window.mobileTest={update,reset:(area='forest')=>reset(area),inputDirection,newEnemy,get state(){return state;},get touch(){return {...touch};}};
     preload().catch(error=>{`)}));
    await page.addInitScript(()=>{window.requestAnimationFrame=()=>0;window.pointerLog=[];for(const t of ['pointerdown','pointerup','pointercancel'])window.addEventListener(t,e=>pointerLog.push({type:e.type,id:e.pointerId,target:e.target.id,pointerType:e.pointerType}));});
-   await page.goto('http://alchemy.test/v0.2.html');await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
+   await page.goto('http://alchemy.test/v0.2.html?test=1');await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
    const bounds=await page.evaluate(()=>{
     const rect=id=>{const r=document.getElementById(id).getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};
     return {stick:rect('joystick'),attack:rect('attack-btn'),stage:rect('stage-wrap'),overflow:document.documentElement.scrollWidth>innerWidth};
@@ -64,7 +64,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
    const context=await browser.newContext({viewport,isMobile:true,hasTouch:true});const page=await context.newPage();
    await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:html.replace('  preload().catch(error=>{',`window.liveTouch=()=>({x:state.player.x,y:state.player.y,attacks:diagnostic.attacks});
   preload().catch(error=>{`)}));
-   await page.goto('http://alchemy.test/v0.2.html');await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
+   await page.goto('http://alchemy.test/v0.2.html?test=1');await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
    const stick=await page.locator('#joystick').boundingBox(),attack=await page.locator('#attack-btn').boundingBox();
    const client=await context.newCDPSession(page),point=(id,x,y)=>({id,x,y,radiusX:5,radiusY:5,force:1});
    const left=point(1,stick.x+stick.width/2+30,stick.y+stick.height/2-30),right=point(2,attack.x+attack.width/2,attack.y+attack.height/2);

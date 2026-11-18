@@ -22,7 +22,7 @@ const {embedBalance,loadBalance}=require('../scripts/build-balance.cjs');
    const requests=[];page.on('request',r=>requests.push(r.url()));
    await page.addInitScript(()=>window.requestAnimationFrame=()=>0);
    await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:body.replace('  preload().catch(error=>{',`window.balanceTest={MELEE,MONSTERS,AUTOMATON_PATTERNS,EQUIPMENT,MONSTER_REWARDS,QUEST_REWARDS,calculateStats,calculateAttackDamage,requiredXp,reset,selectRegion,update,attack,newEnemy,rewardDefeat,equipItem,damageAutomaton,updateAutomaton,get state(){return state;}};\n  preload().catch(error=>{`)}));
-   await page.goto('http://alchemy.test/');await page.waitForSelector('#region-dialog[open]');await page.locator('#forest-btn').click();
+   await page.goto('http://alchemy.test/?test=1');await page.waitForSelector('#region-dialog[open]');await page.locator('#forest-btn').click();
    const snapshot=await page.evaluate(()=>{const g=balanceTest;return {hp:g.state.player.hp,damage:g.calculateAttackDamage(),melee:g.MELEE,monsters:Object.fromEntries(Object.entries(g.MONSTERS).map(([key,m])=>[key,{hp:m.hp,speed:m.speed,damage:m.damage,name:m.name}])),patterns:g.AUTOMATON_PATTERNS,equipment:g.EQUIPMENT,rewards:[g.MONSTER_REWARDS,g.QUEST_REWARDS],xp:g.requiredXp()};});
    // New config includes extra melee metadata; compare every previously present field.
    if(name==='default'){
@@ -57,9 +57,9 @@ const {embedBalance,loadBalance}=require('../scripts/build-balance.cjs');
      robot.ai.index=2;robot.ai.mode='approach';robot.ai.timer=0;g.updateAutomaton(robot,.01);g.updateAutomaton(robot,.51);const shot=g.state.automatonShots[0];if(Math.abs(Math.hypot(shot.vx,shot.vy)-400)>1e-8||shot.life!==1.5)throw Error('configured projectile');
     });
    }
-   assert.deepEqual(requests,['http://alchemy.test/'],'single HTML needs no external config/assets');await page.close();
+   assert.deepEqual(requests,['http://alchemy.test/?test=1'],'single HTML needs no external config/assets');await page.close();
   }
-  const offline=await browser.newPage();await offline.context().setOffline(true);await offline.setContent(html);await offline.waitForSelector('#region-dialog[open]');assert.equal(await offline.evaluate(()=>ALCHEMY_BALANCE.weapons.sword.range),70);await offline.close();
+  const offline=await browser.newPage();await offline.context().setOffline(true);await offline.setContent(html);await offline.locator('#title-new').click();await offline.waitForSelector('#region-dialog[open]');assert.equal(await offline.evaluate(()=>ALCHEMY_BALANCE.weapons.sword.range),70);await offline.close();
   assert.deepEqual(errors,[]);console.log('PASS unchanged defaults vs 94e6b32; config-only changes affect HP, movement, damage, sword range/cooldown, equipment, progression/heal, quest/rewards, enemy AI and projectile; self-contained HTML; idempotent build/invalid config checks');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

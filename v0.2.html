@@ -71,9 +71,29 @@ html.play-active{overflow:hidden;overscroll-behavior-y:none;scroll-behavior:auto
 #research-room span{background:#203237;padding:12px 5px;border-radius:20px 20px 3px 3px;text-align:center;white-space:pre-line}
 #research-room .talking{outline:2px solid #fff1a0}#story-locker.unlocked{background:#386749;box-shadow:0 0 15px #a9f8ab;transition:background .4s}
 #story-ui{background:#10232b;border:1px solid #8cdaa9;padding:14px;border-radius:12px;line-height:1.7}#story-ui input{display:block;width:100%;font:inherit;min-height:44px}#story-speech{font-size:17px;min-height:5em;white-space:pre-wrap}#region-dialog{width:min(620px,calc(100% - 20px))}
+</style><style>
+[hidden]{display:none!important}
+.toolbar-actions{display:flex;flex-wrap:wrap;gap:5px;min-width:0}
+.title-screen{min-height:100svh;display:grid;grid-template-columns:minmax(220px,1fr) minmax(270px,440px);gap:6vw;align-items:center;padding:max(24px,env(safe-area-inset-top)) max(6vw,env(safe-area-inset-right));background:radial-gradient(ellipse at 25% 50%,#35594c 0,transparent 45%),linear-gradient(125deg,#102b2d,#111a27 75%)}
+.title-art{position:relative;min-height:280px;border-bottom:18px solid #886a45;background:repeating-linear-gradient(0deg,transparent 0 80px,#50685b44 80px 86px);display:grid;place-content:center;text-align:center;color:#a6e4ba}
+.title-art:before{content:'⚗';font-size:140px;filter:drop-shadow(0 0 26px #7dc8a4);animation:title-glow 5s ease-in-out infinite alternate}.title-art:after{content:'ALCHEMY RESEARCH LAB';letter-spacing:.18em;font-size:12px;padding:20px}.title-copy .eyebrow{color:#a7ccba;letter-spacing:.2em;font-size:12px}.title-copy h1{font:900 clamp(30px,5vw,60px)/1.05 Georgia,serif;color:#f1e3b4;letter-spacing:-.03em;margin:12px 0}.title-copy p{line-height:1.6;color:#adbeaf}.title-menu{display:grid;gap:10px;margin:24px 0}.title-menu button{font:inherit;min-height:48px;border:1px solid #5a8174;border-radius:8px;background:#223c3c;color:#eff5e9;padding:10px 20px;text-align:left;touch-action:manipulation}.title-menu button:first-child{background:#d9c48d;color:#142c2a;font-weight:800}.title-menu button:disabled{opacity:.5;cursor:not-allowed}.title-menu button:focus-visible{outline:3px solid #d7f7bd;outline-offset:3px}
+.title-dialog{max-width:480px;width:calc(100% - 32px);max-height:85svh;overflow:auto;background:#182f35;color:#eff5e9;border:1px solid #a2c8ad;border-radius:14px;padding:24px;line-height:1.7}.title-dialog::backdrop{background:#061217dd}.title-dialog label{display:block;margin:18px 0}.title-dialog input,.title-dialog select{min-height:24px;min-width:24px;vertical-align:middle}.large-story #story-speech{font-size:20px}.reduced-motion .title-art:before{animation:none}
+@keyframes title-glow{from{opacity:.65;transform:translateY(0)}to{opacity:1;transform:translateY(-6px)}}
+@media(prefers-reduced-motion:reduce){.title-art:before{animation:none}}
+@media(max-width:600px) and (orientation:portrait){.title-screen{grid-template-columns:1fr;gap:12px;padding:22px}.title-art{min-height:110px}.title-art:before{font-size:65px}.title-art:after{padding:8px}.title-menu{margin:14px 0}}
+@media(max-height:500px) and (orientation:landscape){.title-screen{gap:4vw;padding:16px 5vw}.title-art{min-height:210px}.title-copy h1{font-size:30px;line-height:1;margin:0 0 6px}.title-copy .eyebrow{display:none}.title-copy>p{font-size:12px;line-height:1.3}.title-menu{gap:6px;margin:12px 0}.title-menu button{min-height:44px;padding:7px 16px}.title-copy p{margin:6px 0}}
 </style></head>
 <body>
-  <main class="app">
+
+  <section id="title-screen" class="title-screen" aria-labelledby="title-heading">
+    <div class="title-art" aria-hidden="true"></div>
+    <div class="title-copy"><span class="eyebrow">알케리온 · 연구소에 오신 것을 환영합니다</span><h1 id="title-heading">PROJECT<br>ALCHEMY</h1><p>CHAPTER 01 / prototype<br>수상한 면접</p>
+    <nav class="title-menu" aria-label="게임 시작 메뉴"><button id="title-new" disabled>새 게임</button><button id="title-continue" disabled aria-describedby="continue-note">이어하기 · 준비 중</button><button id="title-options">설정</button><button id="title-credits">크레딧 · 테스트 정보</button></nav>
+    <p id="continue-note">저장 기능 미지원 · 새로고침과 새 게임 시 진행이 초기화됩니다.</p><p id="title-status" role="status">게임 자료를 불러오는 중…</p></div>
+  </section>
+  <dialog id="title-settings" class="title-dialog" aria-labelledby="settings-heading"><h2 id="settings-heading">설정</h2><label><input type="checkbox" id="setting-motion"> 배경 움직임 줄이기</label><label><input type="checkbox" id="setting-text"> 대화 글자 크게</label><label><input type="checkbox" id="setting-fullscreen"> 새 게임에서 전체 화면 요청</label><p>전체 화면 미지원·거부 시 화면을 채우는 플레이 레이아웃을 사용합니다. 음원과 오디오 설정은 아직 구현되지 않았습니다. 설정은 이 탭에서만 유지됩니다.</p><button class="tool-btn" data-title-close>닫기</button></dialog>
+  <dialog id="title-info" class="title-dialog" aria-labelledby="info-heading"><h2 id="info-heading">크레딧 · 테스트 정보</h2><p>PROJECT ALCHEMY · CHAPTER 01 prototype</p><p>픽셀 그래픽: Ninja Adventure — Pixel-Boy. 연구소·NPC·시약 투척은 임시 UI 및 Canvas 표현입니다.</p><p>테스트 캐릭터만 사용합니다. 저장·계정 연동·강화 기능은 없습니다. 실제 모바일 조작감과 iOS Safari는 별도 확인이 필요합니다.</p><details><summary>개발 테스트 진입</summary><p>스토리를 건너뛰는 기존 전투 테스트 화면입니다. 새 게임의 스토리 진행과 구분됩니다.</p><button id="title-test" class="tool-btn" disabled>전투 테스트 열기</button></details><button class="tool-btn" data-title-close>닫기</button></dialog>
+  <main class="app" hidden>
     <header class="masthead">
       <div class="brand-wrap">
         <div class="brand-symbol" aria-hidden="true">⚗</div>
@@ -94,7 +114,7 @@ html.play-active{overflow:hidden;overscroll-behavior-y:none;scroll-behavior:auto
         </div>
         <div class="game-toolbar">
           <div class="keyhint"><span class="keycap">W</span><span class="keycap">A</span><span class="keycap">S</span><span class="keycap">D</span> 이동 <span class="keycap widekey">SPACE / J</span> 누르고 있으면 연속 공격</div>
-          <output id="play-stats" aria-label="전투 상태"></output><div class="toolbar-actions"><button type="button" class="tool-btn tool-btn-bright" id="play-mode-btn">게임 시작 · 전용 화면</button><button type="button" class="tool-btn" id="fullscreen-btn" hidden>전체 화면</button><button type="button" class="tool-btn" id="exit-play-btn">플레이 종료</button><button type="button" id="region-btn" class="tool-btn">지역</button><button type="button" id="evaluation-return-btn" class="tool-btn" hidden>보고 준비</button><button type="button" id="inventory-btn" class="tool-btn">가방</button><button type="button" id="pause-btn" class="tool-btn">Ⅱ 일시정지</button><button type="button" id="reset-btn" class="tool-btn tool-btn-bright">↻ 다시 시작</button></div>
+          <output id="play-stats" aria-label="전투 상태"></output><div class="toolbar-actions"><button type="button" class="tool-btn tool-btn-bright" id="play-mode-btn">게임 시작 · 전용 화면</button><button type="button" class="tool-btn" id="fullscreen-btn" hidden>전체 화면</button><button type="button" class="tool-btn" id="exit-play-btn">플레이 종료</button><button type="button" id="region-btn" class="tool-btn">지역</button><button type="button" id="evaluation-return-btn" class="tool-btn" hidden>보고 준비</button><button type="button" id="inventory-btn" class="tool-btn">가방</button><button type="button" class="tool-btn" id="title-return-btn">타이틀</button><button type="button" id="pause-btn" class="tool-btn">Ⅱ 일시정지</button><button type="button" id="reset-btn" class="tool-btn tool-btn-bright">↻ 다시 시작</button></div>
         </div>
         <div class="mobile-controls" aria-label="터치 조작 버튼">
           <div id="joystick" class="joystick" role="group" aria-label="가상 조이스틱: 드래그하여 이동"><div id="joystick-knob" class="joystick-knob"></div></div>
@@ -1464,7 +1484,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   }
   function frame(now){
     const dt=clamp((now-previousFrame)/1000||.016,0,B.combat.maxFrameDt);previousFrame=now;
-    update(dt);draw();renderInputDebug();renderAutomatonStatus();window.requestAnimationFrame(frame);
+    if(started){update(dt);draw();renderInputDebug();renderAutomatonStatus();}window.requestAnimationFrame(frame);
   }
   function togglePause(){
     if(inventorySession||regionSession)return;
@@ -1476,6 +1496,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   function bindInput(){
     const keyboard={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',a:'left',s:'down',d:'right',W:'up',A:'left',S:'down',D:'right'};
     window.addEventListener('keydown',e=>{
+      if(!started)return;
       recordKey(e);
       if(regionSession){if(e.code==='Escape'){closeRegionMenu();e.preventDefault();}return;}
       if(inventorySession){if(e.code==='Escape'){closeInventory();e.preventDefault();}return;}
@@ -1634,18 +1655,45 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   }
 
   // STORY_RUNTIME:END
+  function startFromTitle(testMode=false){
+    $('title-info').close();$('title-settings').close();
+    $('title-screen').hidden=true;document.querySelector('.app').hidden=false;
+    started=true;reset('lobby');state.story.started=!testMode;
+    if(!testMode)enterPlayMode();openRegionMenu();
+    if(!testMode&&$('setting-fullscreen').checked)requestPlayFullscreen();
+  }
+  function returnToTitle(){
+    closeInventory();closeRegionMenu();exitPlayMode();clearInput();paused=true;started=false;
+    document.querySelector('.app').hidden=true;$('title-screen').hidden=false;
+    $('title-status').textContent='새 게임을 선택하면 처음부터 시작합니다. 진행은 저장되지 않습니다.';$('title-new').focus();
+  }
+  function setupTitle(){
+    paused=true;started=false;clearInput();
+    $('title-new').disabled=false;$('title-test').disabled=false;$('title-status').textContent='준비 완료 · 새 게임으로 면접을 시작하세요.';
+    $('title-new').addEventListener('click',()=>startFromTitle());
+    $('title-test').addEventListener('click',()=>startFromTitle(true));
+    $('title-options').addEventListener('click',()=>$('title-settings').showModal());
+    $('title-credits').addEventListener('click',()=>$('title-info').showModal());
+    document.querySelectorAll('[data-title-close]').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));
+    $('setting-motion').addEventListener('change',e=>document.body.classList.toggle('reduced-motion',e.target.checked));
+    $('setting-text').addEventListener('change',e=>document.body.classList.toggle('large-story',e.target.checked));
+    $('title-return-btn').addEventListener('click',returnToTitle);
+    // Explicit legacy automation entry; normal URLs always show the title.
+    if(new URLSearchParams(location.search).get('test')==='1')startFromTitle(true);
+  }
   async function preload(){
     const entries=Object.entries(CFG.files);
     await Promise.all(entries.map(([name,path])=>new Promise((resolve,reject)=>{
       const img=new Image();img.onload=()=>{images[name]=img;resolve();};
       img.onerror=()=>reject(new Error('그래픽 불러오기 실패: '+path));img.src=path;
     })));
-    createGround();bindInput();reset();started=true;openRegionMenu();
+    createGround();bindInput();reset();setupTitle();
     $('stage-loading').classList.add('hidden');
     window.requestAnimationFrame(frame);
   }
   preload().catch(error=>{
     console.error(error);
+    $('title-status').textContent='그래픽을 불러오지 못했습니다. 새로고침 후 다시 시도하세요.';
     $('stage-loading').textContent='그래픽 로드 오류. assets 폴더가 index.html과 함께 있는지 확인하세요. ('+error.message+')';
   });
 })();

@@ -12,7 +12,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
     const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
     await page.addInitScript(()=>{requestAnimationFrame=()=>0;performance.now=()=>0;});
     await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));
-    await page.goto('http://alchemy.test/');await page.waitForSelector('#region-dialog[open]');
+    await page.goto('http://alchemy.test/?test=1');await page.waitForSelector('#region-dialog[open]');
     assert.match(await page.locator('#weapon-staff').innerText(),/연금 도구 · 시약 투척\(시험\)/);
     await page.locator('#weapon-staff').tap();await page.locator('#forest-btn').tap();await page.locator('#play-mode-btn').tap();await page.waitForSelector('.play-screen');
     const prep=()=>page.evaluate(()=>{const g=reagentTest;g.selectRegion('forest');g.state.enemies=[];g.state.player.aim={x:1,y:0};});
@@ -59,7 +59,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
     console.log('PASS unchanged balance, short/long charge, fixed target, parabolic pose, 0.35s impact, one-shot radius, no path collision/DOT, renderer independence, pause/cleanup, splash expiry');
     // Real RAF and actual keyboard events: do not depend solely on stepping game helpers.
     const live=await browser.newPage({viewport:{width:1000,height:700}});live.on('pageerror',e=>errors.push(e.message));
-    await live.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await live.goto('http://alchemy.test/');await live.waitForSelector('#region-dialog[open]');await live.locator('#weapon-staff').click();await live.locator('#forest-btn').click();
+    await live.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await live.goto('http://alchemy.test/?test=1');await live.waitForSelector('#region-dialog[open]');await live.locator('#weapon-staff').click();await live.locator('#forest-btn').click();
     await live.evaluate(()=>{const g=reagentTest;g.state.enemies=[];window.impactFrames=[];function observe(t){const a=g.state.playerAreas[0];impactFrames.push({t,has:!!a,resolved:a?.resolved,delay:a?.delay});if(impactFrames.length<160)requestAnimationFrame(observe);}requestAnimationFrame(observe);});
     await live.keyboard.down('Space');await live.keyboard.down('ArrowRight');await live.waitForTimeout(760);assert.equal(await live.evaluate(()=>reagentTest.state.playerAreas.length),0);
     await live.keyboard.up('Space');await live.keyboard.up('ArrowRight');await live.waitForFunction(()=>reagentTest.state.playerAreas[0]?.resolved);await live.waitForTimeout(300);

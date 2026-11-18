@@ -5,7 +5,7 @@ const {chromium}=require('playwright');const fs=require('node:fs'),path=require(
  const results={};
  for(const [version,html] of [['before',baseline],['after',current]]){
   const p=await browser.newPage();await p.addInitScript(()=>window.requestAnimationFrame=()=>0);
-  await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:html.replace('  preload().catch(error=>{',`window.tune={selectRegion,update,hitByAutomaton,updateAutomaton,inStrike,automatonStrikeHits,drawPlayer,AUTOMATON_PATTERNS,MELEE,MONSTERS,get state(){return state;}};\n  preload().catch(error=>{`)}));await p.goto('http://alchemy.test/');await p.waitForSelector('#region-dialog[open]');await p.locator('#training-btn').click();
+  await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:html.replace('  preload().catch(error=>{',`window.tune={selectRegion,update,hitByAutomaton,updateAutomaton,inStrike,automatonStrikeHits,drawPlayer,AUTOMATON_PATTERNS,MELEE,MONSTERS,get state(){return state;}};\n  preload().catch(error=>{`)}));await p.goto('http://alchemy.test/?test=1');await p.waitForSelector('#region-dialog[open]');await p.locator('#training-btn').click();
   results[version]=await p.evaluate(()=>{
    const g=tune,counts=[],durations=[];
    for(let i=0;i<4;i++){

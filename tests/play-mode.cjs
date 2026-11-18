@@ -1,13 +1,13 @@
 // Run: node tests/play-mode.cjs. Native Chromium mobile touch + real fullscreen.
 const {chromium,webkit}=require('playwright');
 const fs=require('node:fs'),assert=require('node:assert/strict');
-const html=fs.readFileSync(require('node:path').join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();started=true;openRegionMenu();',"createGround();bindInput();reset();started=true;selectRegion('forest');");
+const html=fs.readFileSync(require('node:path').join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();setupTitle();',"createGround();bindInput();reset();setupTitle();selectRegion('forest');");
 async function run(browser,engine,cdp=true){
  for(const viewport of [{width:360,height:640},{width:390,height:844},{width:844,height:390},{width:820,height:1180},{width:1180,height:820}]){
   const context=await browser.newContext({viewport,isMobile:true,hasTouch:true});const page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:html.replace('  preload().catch(error=>{',`window.playTest=()=>({x:state.player.x,y:state.player.y,attacks:diagnostic.attacks,touch:{...touch},paused});\n  preload().catch(error=>{`)}));
-  await page.goto('http://alchemy.test/v0.2.html');await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
+  await page.goto('http://alchemy.test/v0.2.html?test=1');await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
   await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';window.addEventListener('click',e=>{if(e.target.id==='play-mode-btn')window.entryScroll=scrollY;},true);});
   await page.locator('#play-mode-btn').scrollIntoViewIfNeeded();await page.evaluate(()=>{const top=document.getElementById('play-mode-btn').getBoundingClientRect().top;scrollBy(0,Math.min(120,Math.max(0,top-30)));});await page.locator('#play-mode-btn').tap();
   await page.waitForFunction(()=>document.querySelector('.play-screen'));
@@ -48,7 +48,7 @@ async function run(browser,engine,cdp=true){
   const page=await browser.newPage({viewport:{width:844,height:390}});
   if(mode==='unsupported')await page.addInitScript(()=>Object.defineProperty(document,'fullscreenEnabled',{value:false}));
   if(mode==='denied')await page.addInitScript(()=>{Element.prototype.requestFullscreen=()=>Promise.reject(new DOMException('Denied','NotAllowedError'));});
-  await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:html}));await page.goto('http://alchemy.test/');await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));await page.locator('#play-mode-btn').scrollIntoViewIfNeeded();await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';scrollBy(0,80);window.fullscreenEntry=scrollY;});await page.locator('#play-mode-btn').click();
+  await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:html}));await page.goto('http://alchemy.test/?test=1');await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));await page.locator('#play-mode-btn').scrollIntoViewIfNeeded();await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';scrollBy(0,80);window.fullscreenEntry=scrollY;});await page.locator('#play-mode-btn').click();
   if(mode==='unsupported')assert.equal(await page.locator('#fullscreen-btn').isVisible(),false);
   else if(await page.locator('#fullscreen-btn').isVisible()){await page.locator('#fullscreen-btn').click();await page.waitForTimeout(150);if(mode==='native')console.log('Native fullscreen observed:',await page.evaluate(()=>!!document.fullscreenElement));}
   assert.equal(await page.locator('.play-screen').count(),1);await page.locator('#exit-play-btn').click();await page.waitForTimeout(100);assert.equal(await page.evaluate(()=>!!document.fullscreenElement),false);assert.equal(await page.evaluate(()=>scrollY),await page.evaluate(()=>fullscreenEntry));await page.close();console.log('PASS fullscreen',engine,mode);

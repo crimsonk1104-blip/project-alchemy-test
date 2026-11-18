@@ -7,7 +7,7 @@ const assert=require('node:assert/strict');
  try{
   const page=await browser.newPage({viewport:{width:1440,height:1100}}),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
-  const html=fs.readFileSync(require('node:path').join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();started=true;openRegionMenu();',"createGround();bindInput();reset();started=true;selectRegion('forest');");
+  const html=fs.readFileSync(require('node:path').join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();setupTitle();',"createGround();bindInput();reset();setupTitle();selectRegion('forest');");
   // Observation only: no fake frames, keys, timers, or modified attack decisions.
   const observed=html.replace('  preload().catch(error=>{',`
     window.attackObservations=[];const executeAttack=attack;
@@ -15,7 +15,7 @@ const assert=require('node:assert/strict');
       if(state.player.strike!==before)window.attackObservations.push({time:performance.now(),direction:{...state.player.strike.direction},x:state.player.x,y:state.player.y});};
     preload().catch(error=>{`);
   await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:observed}));
-  await page.goto('http://alchemy.test/v0.2.html?inputDebug=1');
+  await page.goto('http://alchemy.test/v0.2.html?inputDebug=1&test=1');
   await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
   const observations=()=>page.evaluate(()=>attackObservations);
   const diagnostic=()=>page.locator('#input-diagnostics').innerText();

@@ -1,11 +1,11 @@
 const {chromium}=require('playwright');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 (async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});try{
- const html=fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();started=true;openRegionMenu();',"createGround();bindInput();reset();started=true;selectRegion('forest');");
+ const html=fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8').replace('createGround();bindInput();reset();setupTitle();',"createGround();bindInput();reset();setupTitle();selectRegion('forest');");
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:html.replace('  preload().catch(error=>{',`window.rewardsTest={reset:(area='forest')=>reset(area),update,attack,newEnemy,rewardDefeat,openInventory,closeInventory,get state(){return state;},get paused(){return paused;},get touch(){return {...touch};}};\n  preload().catch(error=>{`)}));
  await page.addInitScript(()=>{window.requestAnimationFrame=()=>0;});
- await page.goto('http://alchemy.test/');await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
+ await page.goto('http://alchemy.test/?test=1');await page.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));
  const result=await page.evaluate(()=>{
   const g=rewardsTest,check=(v,m)=>{if(!v)throw Error(m);};g.reset();
   const e=g.state.enemies[0];check(!g.rewardDefeat(e),'live enemy cannot reward');
@@ -33,7 +33,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  for(const viewport of [{width:360,height:640},{width:844,height:390},{width:820,height:1180},{width:1180,height:820}]){
   const context=await browser.newContext({viewport,isMobile:true,hasTouch:true});const p=await context.newPage();p.on('pageerror',e=>errors.push(e.message));
   await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:html.replace('  preload().catch(error=>{',`window.mobileInventory=()=>({x:state.player.x,y:state.player.y,attacks:diagnostic.attacks,paused,touch:{...touch}});\n  preload().catch(error=>{`)}));
-  await p.goto('http://alchemy.test/');await p.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));await p.locator('#play-mode-btn').tap();await p.waitForSelector('.play-screen');
+  await p.goto('http://alchemy.test/?test=1');await p.waitForFunction(()=>document.querySelector('#stage-loading').classList.contains('hidden'));await p.locator('#play-mode-btn').tap();await p.waitForSelector('.play-screen');
   const cdp=await context.newCDPSession(p),stick=await p.locator('#joystick').boundingBox(),attack=await p.locator('#attack-btn').boundingBox();const point=(id,x,y)=>({id,x,y,radiusX:5,radiusY:5,force:1});
   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point(1,stick.x+stick.width/2+24,stick.y+stick.height/2-24),point(2,attack.x+attack.width/2,attack.y+attack.height/2)]});await p.waitForTimeout(200);
   await p.locator('#inventory-btn').tap();await p.waitForSelector('#inventory-dialog[open]');const stopped=await p.evaluate(()=>mobileInventory());assert.equal(stopped.paused,true);assert.equal(stopped.touch.pointerId,null);assert.equal(stopped.touch.attackId,null);

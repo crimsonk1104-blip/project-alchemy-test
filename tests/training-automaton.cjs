@@ -2,7 +2,7 @@ const {chromium}=require('playwright');const fs=require('node:fs'),path=require(
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});try{
  const html=fs.readFileSync(path.join(__dirname,'../v0.2.html'),'utf8'),errors=[];
  const instrument=html.replace('  preload().catch(error=>{',`window.robot={selectRegion,reset,update,updateAutomaton,draw,drawAutomatonStrike,renderAutomatonStatus,damageAutomaton,MONSTERS,AUTOMATON_PATTERNS,get state(){return state;}};\n  preload().catch(error=>{`);
- const p=await b.newPage();p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>window.requestAnimationFrame=()=>0);await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await p.goto('http://alchemy.test/');await p.waitForSelector('#region-dialog[open]');await p.locator('#training-btn').click();
+ const p=await b.newPage();p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>window.requestAnimationFrame=()=>0);await p.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await p.goto('http://alchemy.test/?test=1');await p.waitForSelector('#region-dialog[open]');await p.locator('#training-btn').click();
  const report=await p.evaluate(()=>{
   const g=robot,check=(v,m)=>{if(!v)throw Error(m);},result=[];
   check(g.MONSTERS.automaton.speed===178*.70,'movement 30% slower');
@@ -47,7 +47,7 @@ const {chromium}=require('playwright');const fs=require('node:fs'),path=require(
  // Real keyboard evasion in a controlled starting position; timers and movement run live.
  for(let index=0;index<4;index++){
   const dodgePage=await b.newPage();dodgePage.on('pageerror',e=>errors.push(e.message));
-  await dodgePage.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await dodgePage.goto('http://alchemy.test/');await dodgePage.waitForSelector('#region-dialog[open]');await dodgePage.locator('#training-btn').click();
+  await dodgePage.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await dodgePage.goto('http://alchemy.test/?test=1');await dodgePage.waitForSelector('#region-dialog[open]');await dodgePage.locator('#training-btn').click();
   await dodgePage.evaluate(index=>{const e=robot.state.enemies[0];e.ai.index=index;e.ai.timer=.2;e.hp=12;robot.state.player.x=e.x-50;robot.state.player.y=e.y;},index);
   await dodgePage.waitForFunction(()=>robot.state.enemies[0].ai.mode==='windup');
   const pattern=await dodgePage.evaluate(index=>robot.AUTOMATON_PATTERNS[index],index),key=index===0?'ArrowLeft':'ArrowUp';
@@ -55,7 +55,7 @@ const {chromium}=require('playwright');const fs=require('node:fs'),path=require(
   const dodged=await dodgePage.evaluate(index=>({hp:robot.state.player.hp,executed:robot.state.enemies[0].ai.used[index]}),index);assert.equal(dodged.hp,100);assert.ok(dodged.executed>=1);console.log('PASS native keyboard evade',pattern.id,dodged);await dodgePage.close();
  }
  // Live gameplay using actual held keyboard events: no forced HP, position or AI timers.
- const q=await b.newPage({viewport:{width:1200,height:800}});q.on('pageerror',e=>errors.push(e.message));await q.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await q.goto('http://alchemy.test/');await q.waitForSelector('#region-dialog[open]');await q.locator('#training-btn').click();await q.locator('#play-mode-btn').click();
+ const q=await b.newPage({viewport:{width:1200,height:800}});q.on('pageerror',e=>errors.push(e.message));await q.route('http://alchemy.test/**',r=>r.fulfill({contentType:'text/html',body:instrument}));await q.goto('http://alchemy.test/?test=1');await q.waitForSelector('#region-dialog[open]');await q.locator('#training-btn').click();await q.locator('#play-mode-btn').click();
  await q.evaluate(()=>window.observedRobot=robot.state.enemies[0]);await q.keyboard.down('Space');const held=new Set(),seen=new Set();
  for(let frame=0;frame<120;frame++){
   const snapshot=await q.evaluate(()=>({hp:robot.state.player.hp,status:robot.state.evaluation.status,dx:observedRobot.x-robot.state.player.x,dy:observedRobot.y-robot.state.player.y,index:observedRobot.ai.index,used:[...observedRobot.ai.used]}));
