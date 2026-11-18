@@ -98,7 +98,7 @@ html.play-active{overflow:hidden;overscroll-behavior-y:none;scroll-behavior:auto
         <dialog id="region-dialog" aria-labelledby="region-title">
           <div class="inventory-head"><h2 id="region-title">연구소 로비 · 임시 지역 메뉴</h2><button type="button" id="region-close" class="tool-btn">닫기</button></div>
           <p>스토리 대본과 NPC 보고는 아직 연결되지 않았습니다. 플레이어는 로비에서 선택한 무기 하나만 사용합니다. 자동인형의 4종 무장은 Canvas 임시 그래픽과 임시 공격 리듬을 사용합니다.</p>
-          <p id="evaluation-status"></p><fieldset><legend>임시 무기 시험대 · 로비에서 선택</legend><p id="trial-weapon-info"></p><button type="button" class="tool-btn" id="weapon-sword" data-weapon="sword">⚔ 검 / 기본 검으로 복귀</button><button type="button" class="tool-btn" id="weapon-spear" data-weapon="spear">↗ 창</button><button type="button" class="tool-btn" id="weapon-bow" data-weapon="bow">➶ 활</button><button type="button" class="tool-btn" id="weapon-staff" data-weapon="staff">✦ 지팡이</button><p>정식 보유 장비가 아닌 임시 시험 선택입니다. 신규 그래픽·밸런스는 Canvas 프로토타입입니다. 지팡이는 누르는 동안 방향·거리를 지정하고 놓으면 시전합니다. 버튼 밖으로 놓거나 Esc로 취소할 수 있습니다.</p></fieldset>
+          <p id="evaluation-status"></p><fieldset><legend>임시 무기 시험대 · 로비에서 선택</legend><p id="trial-weapon-info"></p><button type="button" class="tool-btn" id="weapon-sword" data-weapon="sword">⚔ 검 / 기본 검으로 복귀</button><button type="button" class="tool-btn" id="weapon-spear" data-weapon="spear">↗ 창</button><button type="button" class="tool-btn" id="weapon-bow" data-weapon="bow">➶ 활</button><button type="button" class="tool-btn" id="weapon-staff" data-weapon="staff">⚗ 연금 도구 · 시약 투척(시험)</button><p>정식 보유 장비가 아닌 임시 시험 선택입니다. 신규 그래픽·밸런스는 Canvas 프로토타입입니다. 시약 투척은 누르는 동안 방향·거리를 지정하고 놓으면 던집니다. 정식 무기 분류·스토리 변경이 아닌 네 번째 전투 스타일의 시험입니다. 버튼 밖으로 놓거나 Esc로 취소할 수 있습니다.</p></fieldset>
           <button type="button" id="forest-btn" class="tool-btn">연금의 숲 · 반복 슬라임 전투</button>
           <button type="button" id="training-btn" class="tool-btn">연구소 뒤뜰 훈련장 · 자동인형 1대1 평가</button>
           <button type="button" id="lobby-btn" class="tool-btn">연구소 로비로 이동</button>
@@ -364,44 +364,47 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   }
   // Catalogs, mutable holdings, and reward policies are separate; no persistence.
   const REGIONS=Object.freeze({lobby:{name:'연구소 로비'},forest:{name:'연금의 숲'},training:{name:'연구소 뒤뜰 훈련장'}});
-  const WEAPONS={sword:{name:'검',icon:'⚔'},spear:{name:'창',icon:'↗'},bow:{name:'활',icon:'➶'},staff:{name:'지팡이',icon:'✦'}};
+  const WEAPONS={sword:{name:'검',icon:'⚔'},spear:{name:'창',icon:'↗'},bow:{name:'활',icon:'➶'},staff:{name:'연금 도구 · 시약 투척(시험)',icon:'⚗'}};
   function weaponRules(character=state){return B.weapons[character.activeWeapon||'sword'];}
   function selectTrialWeapon(id){
     if(state.area!=='lobby'||!WEAPONS[id]||state.activeWeapon===id)return false;
     clearInput();state.activeWeapon=id;state.player.attack=0;state.player.strike=null;
     state.player.cool=Math.max(state.player.cool,B.weapons[id].cooldown);
-    state.playerShots=[];state.playerMagic=[];updateUi();return true;
+    state.playerShots=[];state.playerAreas=[];updateUi();return true;
   }
-  function staffTarget(aim){
-    const rules=B.weapons.staff;
+  // Internal staff slot remains a test adapter; aiming and damage do not depend on its artwork.
+  const GROUND_ATTACKS={staff:{rules:B.weapons.staff,visual:'reagent',action:'시약병 투척'}};
+  function groundAttackProfile(){return GROUND_ATTACKS[state?.activeWeapon];}
+  function groundTarget(aim,rules=aim.rules){
     const progress=clamp((aim.elapsed-rules.tapGrace)/(rules.maxChargeTime-rules.tapGrace),0,1);
     const distance=rules.minRange+(rules.range-rules.minRange)*progress;
     return {x:aim.x+aim.direction.x*distance,y:aim.y+aim.direction.y*distance,distance};
   }
-  function beginStaffAim(source){
-    if(!started||paused||!state||state.activeWeapon!=='staff'||state.player.hp<=0||state.staffAim)return false;
+  function beginGroundAim(source){
+    const profile=groundAttackProfile();
+    if(!started||paused||!profile||state.player.hp<=0||state.groundAim)return false;
     queuedAttack=null;state.player.attack=0;state.player.walking=false;state.player.walkClock=0;
-    state.staffAim={source,x:state.player.x,y:state.player.y,elapsed:0,startTime:performance.now(),direction:{...(inputDirection()||state.player.aim)}};
+    state.groundAim={source,weapon:state.activeWeapon,rules:profile.rules,visual:profile.visual,action:profile.action,x:state.player.x,y:state.player.y,elapsed:0,startTime:performance.now(),direction:{...(inputDirection()||state.player.aim)}};
     return true;
   }
-  function updateStaffAim(dt){
-    const aim=state.staffAim;if(!aim)return;
-    aim.elapsed=Math.min(B.weapons.staff.maxChargeTime,Math.max(aim.elapsed+dt,(performance.now()-aim.startTime)/1000));
+  function updateGroundAim(dt){
+    const aim=state.groundAim;if(!aim)return;
+    aim.elapsed=Math.min(aim.rules.maxChargeTime,Math.max(aim.elapsed+dt,(performance.now()-aim.startTime)/1000));
     aim.direction={...(inputDirection()||aim.direction)};
     state.player.aim={...aim.direction};state.player.face=spriteFacing(aim.direction);
   }
-  function cancelStaffAim(){if(state)state.staffAim=null;}
-  function finishStaffAim(source){
-    const aim=state?.staffAim;if(!aim||aim.source!==source)return false;
+  function cancelGroundAim(){if(state)state.groundAim=null;}
+  function finishGroundAim(source){
+    const aim=state?.groundAim;if(!aim||aim.source!==source)return false;
     // Sample direction once more for press/release events inside one frame.
-    updateStaffAim(0);const target=staffTarget(aim);state.staffAim=null;
-    if(paused||state.player.hp<=0||state.activeWeapon!=='staff')return false;
-    if(state.player.cool>0){addLog('마법 재사용 대기 중입니다. 준비된 뒤 놓아 시전하세요.');return false;}
-    const p=state.player,rules=B.weapons.staff;
-    p.attack=rules.duration;p.cool=rules.cooldown;p.strike={x:aim.x,y:aim.y,direction:{...aim.direction},weapon:'staff'};
-    diagnostic.attacks++;diagnostic.result='지정 위치 마법 시전';
-    state.playerMagic.push({...target,direction:{...aim.direction},delay:rules.castDelay,rules,damage:calculateAttackDamage(),resolved:false});
-    addLog('지정한 위치에 마법을 시전했습니다.');return true;
+    updateGroundAim(0);const target=groundTarget(aim);state.groundAim=null;
+    if(paused||state.player.hp<=0||state.activeWeapon!==aim.weapon)return false;
+    if(state.player.cool>0){addLog(`${aim.action} 재사용 대기 중입니다. 준비된 뒤 놓아 사용하세요.`);return false;}
+    const p=state.player,rules=aim.rules;
+    p.attack=rules.duration;p.cool=rules.cooldown;p.strike={x:aim.x,y:aim.y,direction:{...aim.direction},weapon:aim.weapon};
+    diagnostic.attacks++;diagnostic.result='지정 위치 '+aim.action;
+    state.playerAreas.push({...target,origin:{x:aim.x,y:aim.y},direction:{...aim.direction},visual:aim.visual,flightDuration:rules.castDelay,delay:rules.castDelay,rules,damage:calculateAttackDamage(),resolved:false});
+    addLog(`지정한 위치에 ${aim.action}을 사용했습니다.`);return true;
   }
   function assistedDirection(direction,rules){
     if(!rules.aimAssistDegrees)return direction;
@@ -440,12 +443,17 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
       if(target){applyPlayerHit(target,shot.damage,shot.rules,shot.direction);shot.remaining=0;}
     }
     state.playerShots=state.playerShots.filter(s=>s.remaining>0);
-    for(const magic of state.playerMagic){
-      if(magic.resolved){magic.life-=dt;continue;}
-      magic.delay-=dt;if(magic.delay>0)continue;magic.resolved=true;magic.life=magic.rules.effectDuration;
-      for(const e of state.enemies)if(e.hp>0&&Math.hypot(e.x-magic.x,e.y-magic.y)<=magic.rules.blastRadius+e.r)applyPlayerHit(e,magic.damage,magic.rules,magic.direction);
+    updateAreaAttacks(dt);
+  }
+  // Time-based area damage is independent of flight/splash rendering.
+  function updateAreaAttacks(dt){
+    for(const area of state.playerAreas){
+      if(area.resolved){area.life-=dt;continue;}
+      area.delay-=dt;if(area.delay>0)continue;
+      area.resolved=true;area.life=Math.max(0,area.rules.effectDuration+area.delay);
+      for(const e of state.enemies)if(e.hp>0&&Math.hypot(e.x-area.x,e.y-area.y)<=area.rules.blastRadius+e.r)applyPlayerHit(e,area.damage,area.rules,area.direction);
     }
-    state.playerMagic=state.playerMagic.filter(m=>!m.resolved||m.life>0);
+    state.playerAreas=state.playerAreas.filter(a=>!a.resolved||a.life>0);
   }
   const MONSTERS=Object.freeze({...B.monsters,automaton:Object.freeze({...B.monsters.automaton,damage:B.automaton.patterns[0].damage})});
   // Presentation stays separate from numeric enemy patterns.
@@ -574,7 +582,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     if(!REGIONS[area])return false;
     closeRegionMenu();closeInventory();clearInput();paused=false;
     state.area=area;$('stage-wrap').classList.toggle('training-region',area==='training');Object.assign(state.player,{x:478,y:342,hp:B.player.maxHp,invuln:0,attack:0,cool:0,strike:null,walking:false,walkClock:0});
-    state.enemies=[];state.playerShots=[];state.playerMagic=[];state.automatonShots=[];state.automatonEffects=[];state.particles=[];state.numbers=[];state.spawnTimer=B.spawning.initialDelay;state.deathNotified=false;
+    state.enemies=[];state.playerShots=[];state.playerAreas=[];state.automatonShots=[];state.automatonEffects=[];state.particles=[];state.numbers=[];state.spawnTimer=B.spawning.initialDelay;state.deathNotified=false;
     if(area==='forest')state.enemies=[newEnemy(627,342),newEnemy(353,416)];
     if(area==='training'){
       if(state.evaluation.status==='notStarted')state.evaluation.status='active';
@@ -765,7 +773,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     document.querySelectorAll('[data-weapon]').forEach(button=>{button.disabled=state.area!=='lobby';button.setAttribute('aria-pressed',String(button.dataset.weapon===state.activeWeapon));});
     $('attack-btn').firstChild.textContent=WEAPONS[state.activeWeapon].icon;
     $('attack-btn').querySelector('small').textContent=state.activeWeapon==='staff'?'누르기·놓기':'ATTACK';
-    document.querySelector('.keyhint').lastChild.textContent=state.activeWeapon==='staff'?' 방향=조준 · 누르기=거리 · 놓기=시전':' 누르고 있으면 연속 공격';
+    document.querySelector('.keyhint').lastChild.textContent=state.activeWeapon==='staff'?' 방향=조준 · 누르기=거리 · 놓기=투척':' 누르고 있으면 연속 공격';
     $('training-btn').textContent=state.area==='training'&&state.player.hp<=0?'훈련장 재도전 · 현재 무기 유지':'연구소 뒤뜰 훈련장 · 자동인형 1대1 평가';
     $('evaluation-status').textContent='면접용 실전 평가: '+EVALUATION_STATES[state.evaluation.status];
     $('evaluation-return-btn').hidden=state.evaluation.status!=='objectiveMet';
@@ -792,7 +800,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     closeRegionMenu();closeInventory();
     clearInput();diagnostic.attacks=0;diagnostic.result='없음';
     tick=0;paused=false;$('pause-btn').textContent='Ⅱ 일시정지';
-    state={area,staffAim:null,activeWeapon:'sword',playerShots:[],playerMagic:[],evaluation:{status:'notStarted'},player:{x:478,y:342,hp:B.player.maxHp,invuln:0,attack:0,cool:0,face:'right',aim:{x:1,y:0},strike:null,walking:false,walkClock:0},enemies:[],automatonShots:[],automatonEffects:[],effects:[],numbers:[],particles:[],kills:0,xp:0,level:B.progression.initialLevel,questDone:false,baseStats:{...B.player.baseStats},equipment:{weapon:null},inventory:{currencies:{},items:{},equipment:{}},rewardedEvents:new Set(),spawnTimer:B.spawning.initialDelay,deathNotified:false};
+    state={area,groundAim:null,activeWeapon:'sword',playerShots:[],playerAreas:[],evaluation:{status:'notStarted'},player:{x:478,y:342,hp:B.player.maxHp,invuln:0,attack:0,cool:0,face:'right',aim:{x:1,y:0},strike:null,walking:false,walkClock:0},enemies:[],automatonShots:[],automatonEffects:[],effects:[],numbers:[],particles:[],kills:0,xp:0,level:B.progression.initialLevel,questDone:false,baseStats:{...B.player.baseStats},equipment:{weapon:null},inventory:{currencies:{},items:{},equipment:{}},rewardedEvents:new Set(),spawnTimer:B.spawning.initialDelay,deathNotified:false};
     selectRegion(area);
     messages.length=0;addLog(REGIONS[state.area].name+'에 입장했습니다.','highlight');updateUi();
   }
@@ -809,15 +817,15 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
   function popup(x,y,message,color){state.numbers.push({x,y,text:message,color,life:.72,vy:-32});}
   function requestAttack(){
     if(!started||paused||!state||state.player.hp<=0)return;
-    if(state.activeWeapon==='staff'){beginStaffAim('internal');return;}
+    if(groundAttackProfile()){beginGroundAim('internal');return;}
     const direction={...(inputDirection()||state.player.aim)};
     if(state.player.cool<=0){queuedAttack=null;attack(direction);}
     else queuedAttack={direction,remaining:weaponRules().buffer}; // One slot, never a combo queue.
   }
-  function clearInput(){cancelStaffAim();keys.clear();attackKeys.clear();queuedAttack=null;releaseJoystick();releaseAttackPointer();}
+  function clearInput(){cancelGroundAim();keys.clear();attackKeys.clear();queuedAttack=null;releaseJoystick();releaseAttackPointer();}
   function attack(direction=inputDirection()){
     if(!started||paused||!state||state.player.hp<=0)return;
-    if(state.activeWeapon==='staff'){beginStaffAim('internal');return;}
+    if(groundAttackProfile()){beginGroundAim('internal');return;}
     const p=state.player;if(p.cool>0)return;
     // Sample held input here too: attacking can precede the next movement frame.
     const rules=weaponRules(),weapon=state.activeWeapon;
@@ -831,14 +839,14 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     const forward=strike.direction;let hits=0;
     if(weapon==='bow')state.playerShots.push({x:p.x,y:p.y,direction:{...forward},remaining:rules.range,rules,damage});
     else for(const e of state.enemies)if(e.hp>0&&(weapon==='sword'?inStrike(strike,e):spearHits(strike,e,rules))){if(applyPlayerHit(e,damage,rules,forward))hits++;}
-    diagnostic.result=weapon==='bow'?'화살 발사':weapon==='staff'?'마법 시전':hits?'적중 '+hits+'마리':'빗나감';
+    diagnostic.result=weapon==='bow'?'화살 발사':hits?'적중 '+hits+'마리':'빗나감';
     if(hits)addLog(`${WEAPONS[weapon].name} 공격 적중! 대상 ${hits}기에 피해를 주었습니다.`);
-    else addLog(weapon==='bow'?'화살을 발사했습니다.':weapon==='staff'?'마법 범위를 시전했습니다.':'공격이 빗나갔습니다. 적을 바라보고 가까이 다가가세요.');
+    else addLog(weapon==='bow'?'화살을 발사했습니다.':'공격이 빗나갔습니다. 적을 바라보고 가까이 다가가세요.');
   }
 
   function movement(dt){
     const p=state.player;
-    if(state.staffAim){p.walking=false;p.walkClock=0;return;}
+    if(state.groundAim){p.walking=false;p.walkClock=0;return;}
     const direction=inputDirection();p.walking=!!direction;
     if(direction){
       const {x,y}=direction;
@@ -853,10 +861,10 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     tick+=dt;const p=state.player;
     const previousCool=p.cool;
     p.cool=Math.max(0,p.cool-dt);p.attack=Math.max(0,p.attack-dt);p.invuln=Math.max(0,p.invuln-dt);
-    updateStaffAim(dt);movement(dt);
+    updateGroundAim(dt);movement(dt);
     // Movement and attack are independent. Held keys are sampled every frame;
     // keyboard repeat events and the pointer tap buffer do not drive auto-attacks.
-    if(state.activeWeapon!=='staff'&&attackKeys.size&&p.cool<=0){
+    if(!groundAttackProfile()&&attackKeys.size&&p.cool<=0){
       queuedAttack=null;attack();
       // Carry the frame's cooldown overshoot to avoid cumulative cadence drift.
       p.cool=Math.max(0,p.cool-Math.max(0,dt-previousCool));
@@ -921,7 +929,8 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
     const [sw,sh]=s.size,dw=sw*s.scale,dh=sh*s.scale;
     if(p.invuln>0&&Math.floor(p.invuln*14)%2===0)ctx.globalAlpha=.55;
     sprite(images[mode],idx*sw,row*sh,sw,sh,p.x-dw/2,p.y-dh+5,dw,dh);ctx.globalAlpha=1;
-    if(state.activeWeapon!=='sword'){
+    if(groundAttackProfile()?.visual==='reagent')drawReagentBottle(p.x+22,p.y-25,0,1);
+    else if(state.activeWeapon!=='sword'){
       ctx.save();ctx.fillStyle=state.activeWeapon==='staff'?'#d7a0ff':'#9ee67d';ctx.font='bold 22px system-ui';ctx.fillText(WEAPONS[state.activeWeapon].icon,p.x+15,p.y-30);ctx.restore();
     }
     if(p.attack>0&&state.activeWeapon==='spear'){
@@ -969,12 +978,57 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
       ctx.fillStyle='#eac17d';ctx.fillRect(Math.round(e.x-19),Math.round(e.y-48),Math.round(38*e.hp/e.maxHp),3);
     }
   }
-  function drawEffects(){
-    if(state.staffAim){
-      const aim=state.staffAim,target=staffTarget(aim);ctx.save();ctx.strokeStyle='#d7a0ff';ctx.fillStyle='#d7a0ff';ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(aim.x,aim.y);ctx.lineTo(target.x,target.y);ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.arc(target.x,target.y,B.weapons.staff.blastRadius,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.18;ctx.fill();ctx.globalAlpha=1;ctx.font='13px system-ui';ctx.fillText(`조준 ${Math.round(target.distance)} · 놓으면 시전 / Esc·버튼 밖으로 놓으면 취소`,Math.max(10,target.x-100),Math.max(125,target.y-60));ctx.restore();
+  // Presentation-only settings: no range, damage or hit timing lives here.
+  const AREA_STYLES={reagent:{color:'#8ff5b0',edge:'#efffa8',arcHeight:64,release:'투척'}};
+  function drawGroundAim(aim,target,radius){
+    const style=AREA_STYLES[aim.visual]||{color:'#d7a0ff',edge:'#ead5ff'};
+    ctx.save();ctx.strokeStyle=style.color;ctx.fillStyle=style.color;ctx.lineWidth=2;
+    ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(aim.x,aim.y);ctx.lineTo(target.x,target.y);ctx.stroke();
+    ctx.beginPath();ctx.arc(target.x,target.y,radius,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    ctx.globalAlpha=.13;ctx.fill();ctx.globalAlpha=1;
+    ctx.beginPath();ctx.moveTo(target.x-6,target.y);ctx.lineTo(target.x+6,target.y);ctx.moveTo(target.x,target.y-6);ctx.lineTo(target.x,target.y+6);ctx.stroke();
+    ctx.font='13px system-ui';const label=`착탄 ${Math.round(target.distance)} · 놓으면 ${style.release||'발동'} / Esc·버튼 밖 취소`;
+    const textWidth=ctx.measureText(label).width;
+    ctx.fillText(label,clamp(target.x-textWidth/2,10,W-textWidth-10),clamp(target.y-radius-12,125,H-15));ctx.restore();
+  }
+  function drawReagentBottle(x,y,rotation,scale=1){
+    ctx.save();ctx.translate(x,y);ctx.rotate(rotation);ctx.scale(scale,scale);
+    ctx.lineWidth=2;ctx.strokeStyle='#e9fff1';ctx.fillStyle='#214a43';
+    ctx.beginPath();ctx.moveTo(-4,-11);ctx.lineTo(4,-11);ctx.lineTo(4,-5);ctx.lineTo(9,1);ctx.lineTo(9,9);ctx.lineTo(-9,9);ctx.lineTo(-9,1);ctx.lineTo(-4,-5);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle=AREA_STYLES.reagent.color;ctx.fillRect(-6,1,12,5);ctx.fillStyle='#e7b66b';ctx.fillRect(-5,-14,10,4);ctx.fillStyle='#fff';ctx.fillRect(-5,-3,2,4);ctx.restore();
+  }
+  function reagentFlightPose(area){
+    const t=clamp(1-area.delay/area.flightDuration,0,1);
+    const groundX=area.origin.x+(area.x-area.origin.x)*t,groundY=area.origin.y+(area.y-area.origin.y)*t;
+    // Ground position stays on the selected trajectory; only the rendered bottle gains height.
+    const height=22*(1-t)+4*AREA_STYLES.reagent.arcHeight*t*(1-t);
+    return {x:groundX,y:groundY-height,groundX,groundY,height,rotation:t*Math.PI*2,t};
+  }
+  function drawReagentAttack(area){
+    const style=AREA_STYLES.reagent,r=area.rules.blastRadius;
+    ctx.save();
+    if(!area.resolved){
+      const pose=reagentFlightPose(area);
+      ctx.strokeStyle=style.color;ctx.globalAlpha=.5;ctx.setLineDash([4,5]);ctx.beginPath();ctx.arc(area.x,area.y,r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+      drawShadow(pose.groundX,pose.groundY,10,4);drawReagentBottle(pose.x,pose.y,pose.rotation,1.1);
+    }else{
+      const remaining=clamp(area.life/area.rules.effectDuration,0,1),spread=1-remaining;
+      // Full boundary matches the one-shot damage radius; inner ripple is decorative.
+      ctx.globalAlpha=remaining*.32;ctx.fillStyle=style.color;ctx.beginPath();ctx.arc(area.x,area.y,r,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=remaining;ctx.strokeStyle=style.edge;ctx.lineWidth=2;ctx.stroke();
+      ctx.strokeStyle=style.color;ctx.beginPath();ctx.arc(area.x,area.y,r*(.3+.7*spread),0,Math.PI*2);ctx.stroke();
+      for(let i=0;i<8;i++){
+        const angle=i*Math.PI/4,distance=9+spread*r*.72,x=area.x+Math.cos(angle)*distance,y=area.y+Math.sin(angle)*distance;
+        ctx.save();ctx.translate(x,y);ctx.rotate(angle+spread*2);ctx.fillStyle=i%2?style.color:'#d6fff3';ctx.beginPath();ctx.moveTo(-3,-3);ctx.lineTo(4,0);ctx.lineTo(-1,4);ctx.closePath();ctx.fill();ctx.restore();
+      }
     }
+    ctx.restore();
+  }
+  const AREA_RENDERERS={reagent:drawReagentAttack};
+  function drawEffects(){
+    if(state.groundAim){const aim=state.groundAim;drawGroundAim(aim,groundTarget(aim),aim.rules.blastRadius);}
     for(const shot of state.playerShots){ctx.save();ctx.translate(shot.x,shot.y);ctx.rotate(Math.atan2(shot.direction.y,shot.direction.x));ctx.strokeStyle='#bdf58b';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(8,0);ctx.lineTo(1,-5);ctx.moveTo(8,0);ctx.lineTo(1,5);ctx.stroke();ctx.restore();}
-    for(const magic of state.playerMagic){ctx.save();ctx.strokeStyle='#d7a0ff';ctx.fillStyle='#d7a0ff';ctx.globalAlpha=magic.resolved?.55:.25;ctx.beginPath();ctx.arc(magic.x,magic.y,magic.rules.blastRadius,0,Math.PI*2);ctx.stroke();ctx.fill();ctx.restore();}
+    for(const area of state.playerAreas)AREA_RENDERERS[area.visual]?.(area);
     for(const e of state.enemies)if(e.type==='automaton'&&e.ai.mode==='windup')drawAutomatonStrike(e);
     for(const fx of state.automatonEffects)drawAutomatonStrike({ai:{strike:fx.strike,mode:'recovery',timer:AUTOMATON_PATTERNS[fx.strike.index].recovery}});
     for(const shot of state.automatonShots){ctx.save();ctx.translate(shot.x,shot.y);ctx.rotate(Math.atan2(shot.vy,shot.vx));ctx.strokeStyle=shot.color;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(8,0);ctx.lineTo(1,-6);ctx.moveTo(8,0);ctx.lineTo(1,6);ctx.stroke();ctx.restore();}
@@ -1013,19 +1067,19 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
       recordKey(e);
       if(regionSession){if(e.code==='Escape'){closeRegionMenu();e.preventDefault();}return;}
       if(inventorySession){if(e.code==='Escape'){closeInventory();e.preventDefault();}return;}
-      if(keyboard[e.key]){keys.add(keyboard[e.key]);if(state.staffAim)updateStaffAim(0);e.preventDefault();}
+      if(keyboard[e.key]){keys.add(keyboard[e.key]);if(state.groundAim)updateGroundAim(0);e.preventDefault();}
       if(e.code==='Space'||e.code==='KeyJ'){
         e.preventDefault();
         if(!e.repeat&&!attackKeys.has(e.code)&&started&&!paused&&state.player.hp>0){
           attackKeys.add(e.code);
           // No keyboard tap queue: releasing the key must cancel future attacks.
-          if(state.activeWeapon==='staff')beginStaffAim('keyboard');
+          if(groundAttackProfile())beginGroundAim('keyboard');
           else if(state.player.cool<=0){queuedAttack=null;attack();}
         }
       }
-      if(e.code==='Escape'){if(state.staffAim)cancelStaffAim();else if(playSession)exitPlayMode();else togglePause();e.preventDefault();}
+      if(e.code==='Escape'){if(state.groundAim)cancelGroundAim();else if(playSession)exitPlayMode();else togglePause();e.preventDefault();}
     });
-    window.addEventListener('keyup',e=>{recordKey(e);if(keyboard[e.key])keys.delete(keyboard[e.key]);attackKeys.delete(e.code);if((e.code==='Space'||e.code==='KeyJ')&&state.activeWeapon==='staff'&&!attackKeys.size)finishStaffAim('keyboard');});
+    window.addEventListener('keyup',e=>{recordKey(e);if(keyboard[e.key])keys.delete(keyboard[e.key]);attackKeys.delete(e.code);if((e.code==='Space'||e.code==='KeyJ')&&groundAttackProfile()&&!attackKeys.size)finishGroundAim('keyboard');});
     window.addEventListener('blur',clearInput);
     document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput();if(started&&!paused&&state.player.hp>0)togglePause();}});
     const joystick=$('joystick');
@@ -1038,7 +1092,7 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
       const scale=length?Math.min(length,travel)/length:0;
       $('joystick-knob').style.transform=`translate(${dx*scale}px,${dy*scale}px)`;
       touch.x=length>radius*JOYSTICK_DEADZONE?dx/length:0;
-      touch.y=length>radius*JOYSTICK_DEADZONE?dy/length:0;if(state.staffAim)updateStaffAim(0);
+      touch.y=length>radius*JOYSTICK_DEADZONE?dy/length:0;if(state.groundAim)updateGroundAim(0);
     }
     joystick.addEventListener('pointerdown',e=>{
       e.preventDefault();
@@ -1055,14 +1109,14 @@ Space 수신: ↓${diagnostic.keyEvents.Space.down} ↑${diagnostic.keyEvents.Sp
       e.preventDefault();
       if(touch.attackId!==null||e.button!==0||!started||paused||state.player.hp<=0)return;
       touch.attackId=e.pointerId;attackButton.setPointerCapture(e.pointerId);
-      if(state.activeWeapon==='staff')beginStaffAim('pointer:'+e.pointerId);else requestAttack();
+      if(groundAttackProfile())beginGroundAim('pointer:'+e.pointerId);else requestAttack();
     });
     ['pointerup','pointercancel','lostpointercapture'].forEach(type=>attackButton.addEventListener(type,e=>{
       if(e.pointerId===touch.attackId){
-        if(state.activeWeapon==='staff'&&state.staffAim?.source==='pointer:'+e.pointerId){
+        if(groundAttackProfile()&&state.groundAim?.source==='pointer:'+e.pointerId){
           const box=attackButton.getBoundingClientRect();
-          if(type==='pointerup'&&e.clientX>=box.left&&e.clientX<=box.right&&e.clientY>=box.top&&e.clientY<=box.bottom)finishStaffAim('pointer:'+e.pointerId);
-          else cancelStaffAim();
+          if(type==='pointerup'&&e.clientX>=box.left&&e.clientX<=box.right&&e.clientY>=box.top&&e.clientY<=box.bottom)finishGroundAim('pointer:'+e.pointerId);
+          else cancelGroundAim();
         }
         if(type!=='pointerup')queuedAttack=null;releaseAttackPointer();
       }

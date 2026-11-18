@@ -82,3 +82,6 @@ done
 
 
 지팡이 수동 조준 설정도 `weapons.staff`에 있다: `minRange`45, `range`240, `maxChargeTime`0.7초, `tapGrace`0.08초, `blastRadius`48, `cooldown`0.9초, `castDelay`0.35초. 충전 피해 증가는 없다. `aimAssistDegrees`는 지팡이에서 제거했으며 활에만 적용한다. 빌드 시 최소/최대 거리와 충전 시간 범위를 검증한다.
+
+
+시약 투척 시험에서도 내부 `weapons.staff` 수치를 그대로 사용한다. `castDelay`0.35초는 비행 및 착탄 대기 시간, `effectDuration`0.22초는 착탄 후 시약 표현의 잔존 시간이다. `AREA_STYLES`의 색상·포물선 높이는 표현 전용이며 전투 수치에 영향을 주지 않는다. 정식 무기 분류나 신규 밸런스 확정이 아니다.
