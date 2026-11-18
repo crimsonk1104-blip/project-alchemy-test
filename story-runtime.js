@@ -33,6 +33,7 @@
       text('장비 보관함 개방 · 초기 지급 장비 무료 교환 가능. 강화 기능은 아직 없습니다.');
       renderStarterChoices(host,true);storyButton(host,'story-cabinet','장비 보관함 열기',()=>{closeRegionMenu();openInventory();});storyButton(host,'story-forest','연금의 숲 · 별도 슬라임 퀘스트',()=>selectRegion('forest'));return;
     }
+    if(q.reselectWeapon){text('전투 전 무기 변경 · 선택 후 준비 화면으로 돌아갑니다.');renderStarterChoices(host,true);return;}
     const line=q.reply?{speaker:'소장',text:q.reply}:scene.lines[q.line];
     $('story-director').classList.toggle('talking',line.speaker==='소장');$('story-disciple').classList.toggle('talking',line.speaker==='제자');
     if(line.kind==='name'){
@@ -45,24 +46,28 @@
       text('대본의 네 번째 선택지는 지팡이입니다. 현재 전투는 시약병 투척 시험으로 연결됩니다. 대본 수정은 검토 대기입니다.');renderStarterChoices(host,false);return;
     }
     if(line.kind==='ready'){
-      ['네! 바로 해보겠습니다.','그... 조금 긴장되는데요.','다른 무기도 써봐도 되죠?'].forEach((value,i)=>storyButton(host,'story-ready-'+i,value,()=>{q.reply=STORY.readyReplies[i];renderStory();}));return;
+      ['네! 바로 해보겠습니다.','그... 조금 긴장되는데요.','다른 무기도 써봐도 되죠?'].forEach((value,i)=>storyButton(host,'story-ready-'+i,value,()=>{q.pendingWeaponChange=i===2;q.reply=STORY.readyReplies[i];renderStory();}));return;
     }
     const speech=document.createElement('p');speech.id='story-speech';speech.textContent=`${line.speaker}: ${line.text}`;speech.setAttribute('aria-live','polite');host.append(speech);
     storyButton(host,'story-prev','이전 대사',()=>{if(!q.reply&&q.line>0&&!scene.lines[q.line-1].kind)q.line--;renderStory();});
-    storyButton(host,'story-next','다음',()=>advanceStory(false));storyButton(host,'story-skip','장면 건너뛰기',()=>advanceStory(true));
+    const readyToFight=q.scene===4&&!q.reply&&q.line===scene.lines.length-1;
+    storyButton(host,'story-next',readyToFight?'실전 평가 시작':'다음',()=>advanceStory(false));storyButton(host,'story-skip','장면 건너뛰기',()=>advanceStory(true)).disabled=readyToFight;
   }
   function storyButton(host,id,label,action){const b=document.createElement('button');b.type='button';b.className='tool-btn';b.id=id;b.textContent=label;b.addEventListener('click',action);host.append(b);return b;}
   function renderStarterChoices(host,exchange){
     for(const [style,item] of Object.entries(STARTERS)){const button=storyButton(host,'story-weapon-'+style,`${item.name} · ${style==='sword'?'근접 베기':style==='spear'?'긴 직선 찌르기':style==='bow'?'화살 투사체':'누르기·조준·놓기 범위 공격'}`,()=>{
       if(!chooseStarter(style))return;
-      if(!exchange){state.story.reply=STORY.weaponReplies[style];}renderStory();
+      if(state.story.reselectWeapon){state.story.reselectWeapon=false;}else if(!exchange){state.story.reply=STORY.weaponReplies[style];}renderStory();
     });button.disabled=state.area!=='lobby';}
   }
   function advanceStory(skip){
-    const q=state.story;if(q.phase!=='dialogue')return;
+    const q=state.story;if(q.phase!=='dialogue'||q.reselectWeapon)return;
+    if(q.pendingWeaponChange){q.pendingWeaponChange=false;q.reply=null;q.reselectWeapon=true;renderStory();return;}
     const scene=STORY.scenes[q.scene];q.started=true;
     if(q.reply){q.reply=null;q.line++;}else q.line++;
-    if(skip){while(q.line<scene.lines.length&&!scene.lines[q.line].kind)q.line++;}
+    if(skip){while(q.line<scene.lines.length&&!scene.lines[q.line].kind)q.line++;
+      if(q.scene===4&&q.line>=scene.lines.length){q.line=scene.lines.length-1;renderStory();return;}
+    }
     if(q.line>=scene.lines.length){
       if(q.scene===4){q.phase='evaluation';selectRegion('training');return;}
       if(q.scene===5)completeEvaluationAfterNpcReport();

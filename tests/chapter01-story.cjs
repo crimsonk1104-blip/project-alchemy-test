@@ -11,7 +11,18 @@ for(const [index,weapon] of ['sword','spear','bow','staff'].entries()){
  // Skip must stop at required name and weapon, never silently fill either.
  while(!await p.locator('#story-name').count())await p.locator('#story-skip').tap();await p.locator('#story-name-confirm').tap();assert.equal(await p.evaluate(()=>chapter.state.story.name),'');await p.locator('#story-name').fill('연구자'+index);await p.locator('#story-name-confirm').tap();
  while(!await p.locator('#story-weapon-'+weapon).count())await p.locator('#story-skip').tap();await p.locator('#story-weapon-'+weapon).tap();assert.equal(await p.evaluate(()=>chapter.state.inventory.equipment[chapter.state.equipment.weapon]),1);assert.equal(await p.evaluate(()=>chapter.state.activeWeapon),weapon);
- while(!await p.locator('#story-ready-0').count())await p.locator('#story-skip').tap();await p.locator('#story-ready-'+(index%3)).tap();while(await p.locator('#story-next').isVisible())await p.locator('#story-next').tap();
+ while(!await p.locator('#story-ready-0').count())await p.locator('#story-skip').tap();
+ // C is an action, including when its reply is skipped. Repeated exchanges stay in scene 5.
+ for(const [n,style] of [['sword','spear','bow','staff'][(index+1)%4],weapon].entries()){
+  await p.locator('#story-ready-2').tap();assert.equal(await p.locator('#story-speech').innerText(),'소장: 그럼. 직접 써봐야 아는 거지. 아직 시작 전이니까 편한 걸로 바꿔 봐.');
+  await p.locator(n===0?'#story-next':'#story-skip').tap();assert.ok(await p.locator('#story-weapon-'+style).isVisible());assert.equal(await p.locator('#story-name').count(),0);
+  assert.equal(await p.evaluate(()=>chapter.state.area),'lobby');assert.equal(await p.evaluate(()=>chapter.state.evaluation.status),'notStarted');assert.equal(await p.evaluate(()=>chapter.state.enemies.length),0);
+  await p.locator('#story-weapon-'+style).tap();assert.ok(await p.locator('#story-ready-0').isVisible());
+  assert.equal(await p.evaluate(()=>chapter.state.activeWeapon),style);assert.equal(await p.evaluate(()=>chapter.state.story.name),'연구자'+index);assert.equal(await p.evaluate(()=>chapter.state.story.scene),4);
+  assert.deepEqual(await p.evaluate(()=>Object.values(chapter.state.inventory.equipment)),[1]);assert.equal(await p.evaluate(()=>chapter.state.inventory.equipment[chapter.state.equipment.weapon]),1);
+  assert.equal(await p.evaluate(()=>chapter.state.area),'lobby');
+ }
+ await p.locator('#story-ready-'+(index%2)).tap();await p.locator('#story-skip').tap();assert.equal(await p.evaluate(()=>chapter.state.area),'lobby');assert.equal(await p.locator('#story-next').innerText(),'실전 평가 시작');assert.ok(await p.locator('#story-skip').isDisabled());while(await p.locator('#story-next').isVisible())await p.locator('#story-next').tap();
  assert.equal(await p.evaluate(()=>chapter.state.area),'training');
  // A loss and real UI retry must keep identity, ownership, chosen style and level.
  await p.evaluate(()=>{chapter.state.player.hp=0;chapter.update(.01);});await p.locator('#region-btn').tap();await p.locator('#story-fight').tap();assert.equal(await p.evaluate(()=>chapter.state.story.name),'연구자'+index);assert.equal(await p.evaluate(()=>chapter.state.activeWeapon),weapon);assert.equal(await p.evaluate(()=>chapter.state.player.hp),100);
