@@ -11,6 +11,11 @@ const {chromium}=require('playwright');const fs=require('node:fs'),path=require(
    for(const dodge of [false,true]){
     g.reset('training');const e=g.state.enemies[0],player=g.state.player;e.ai.index=i;e.ai.timer=0;e.hp=e.maxHp-i*3;
     player.x=e.x-50;player.y=e.y;player.invuln=0;g.updateAutomaton(e,.01);check(e.ai.mode==='windup','telegraph');check(player.hp===100,'no contact damage');
+    g.renderAutomatonStatus();
+    const label=['검술','창술','궁술','범위 마법'][i],status=document.getElementById('automaton-status').textContent;
+    check(pattern.name===label&&status.includes(`공격 패턴 ${i+1}단계/4`), 'stage presentation');
+    check(status.includes(label)&&!status.includes('무장'), 'pattern wording');
+    if(i===3)check(status.includes('범위 마법 — 표시된 영역에서 벗어나세요!'),'exact area warning');
     const fixed=JSON.stringify(e.ai.strike);
     if(dodge){if(i===0)player.x=e.x+140;else if(i===1||i===2)player.y+=120;else{player.x+=150;player.y+=100;}}
     check(JSON.stringify(e.ai.strike)===fixed,'aim locked');
