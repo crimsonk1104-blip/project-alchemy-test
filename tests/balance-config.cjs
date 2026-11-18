@@ -27,7 +27,12 @@ const {embedBalance,loadBalance}=require('../scripts/build-balance.cjs');
    // New config includes extra melee metadata; compare every previously present field.
    if(name==='default'){
     for(const [key,value] of Object.entries(results.before.melee))assert.deepEqual(snapshot.melee[key],value,key);
-    const comparable=structuredClone(snapshot);comparable.melee=results.before.melee;assert.deepEqual(comparable,results.before,'all default values unchanged');
+    const comparable=structuredClone(snapshot);comparable.melee=results.before.melee;
+    // Approved UI labels and additive starter catalog are new; retain every baseline numeric/gear assertion.
+    comparable.patterns=comparable.patterns.map((p,i)=>{const old=results.before.patterns[i];assert.equal(p.name,['검술','창술','궁술','범위 마법'][i]);return {...p,name:old.name,hint:old.hint};});
+    for(const [id,item] of Object.entries(results.before.equipment))assert.deepEqual(snapshot.equipment[id],item);
+    const starters=Object.entries(snapshot.equipment).filter(([id])=>!(id in results.before.equipment));assert.equal(starters.length,4);for(const [,item] of starters)assert.equal(item.bonuses.attack,0);
+    comparable.equipment=results.before.equipment;assert.deepEqual(comparable,results.before,'all default values unchanged');
     assert.equal(await page.evaluate(()=>Object.isFrozen(ALCHEMY_BALANCE.player.baseStats)),true);
    }
    results[name]=snapshot;
